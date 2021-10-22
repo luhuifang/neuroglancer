@@ -24,7 +24,7 @@ import {NullarySignal} from 'neuroglancer/util/signal';
 import {optionallyRestoreFromJsonMember, Trackable} from 'neuroglancer/util/trackable';
 import {TrackableEnum} from 'neuroglancer/util/trackable_enum';
 import * as vector from 'neuroglancer/util/vector';
-
+export let hqDefineScale : number;
 export enum NavigationLinkType {
   LINKED = 0,
   RELATIVE = 1,
@@ -1243,6 +1243,7 @@ abstract class TrackableZoom extends RefCounted implements Trackable,
 
   set value(value: number) {
     const {canonicalVoxelPhysicalSize} = this;
+    hqDefineScale = this.value_
     if (Object.is(value, this.value_) &&
         canonicalVoxelPhysicalSize === this.curCanonicalVoxelPhysicalSize) {
       return;

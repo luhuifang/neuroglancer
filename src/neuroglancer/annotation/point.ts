@@ -25,7 +25,7 @@ import {defineLineShader, drawLines, initializeLineShader} from 'neuroglancer/we
 import {ShaderBuilder, ShaderProgram} from 'neuroglancer/webgl/shader';
 import {defineVectorArrayVertexShaderInput} from 'neuroglancer/webgl/shader_lib';
 import {defineVertexId, VertexIdHelper} from 'neuroglancer/webgl/vertex_id';
-
+import { hqDefineScale } from '../navigation_state';
 class RenderHelper extends AnnotationRenderHelper {
   private defineShaderCommon(builder: ShaderBuilder) {
     const {rank} = this;
@@ -34,6 +34,7 @@ class RenderHelper extends AnnotationRenderHelper {
         builder, 'float', WebGL2RenderingContext.FLOAT, /*normalized=*/ false, 'VertexPosition',
         rank);
     builder.addVarying('highp vec4', 'vBorderColor');
+    builder.addAttribute('highp float', 'aPointSize');
     builder.addVertexCode(`
 float ng_markerDiameter;
 float ng_markerBorderWidth;
@@ -51,7 +52,7 @@ void setPointMarkerBorderColor(vec4 color) {
 }
 `);
     builder.addVertexMain(`
-ng_markerDiameter = 5.0;
+ng_markerDiameter = aPointSize;
 ng_markerBorderWidth = 1.0;
 vBorderColor = vec4(0.0, 0.0, 0.0, 1.0);
 float modelPosition[${rank}] = getVertexPosition0();
@@ -165,6 +166,9 @@ emitAnnotation(vec4(color.rgb, color.a * ${this.getCrossSectionFadeFactor()}));
         this.enable(
             numChunkDisplayDims === 2 ? this.shaderGetter2d : this.shaderGetter1d, context,
             shader => {
+              const {gl} = shader;
+              let pointsize = 1.0/hqDefineScale;
+              gl.vertexAttrib1f(shader.attribute('aPointSize'),pointsize);
               initializeLineShader(
                   shader, context.renderContext.projectionParameters, /*featherWidthInPixels=*/ 1);
               drawLines(shader.gl, 1, context.count);
