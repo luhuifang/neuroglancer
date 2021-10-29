@@ -25,6 +25,7 @@ import {defineLineShader, drawLines, initializeLineShader} from 'neuroglancer/we
 import {ShaderBuilder, ShaderProgram} from 'neuroglancer/webgl/shader';
 import {defineVectorArrayVertexShaderInput} from 'neuroglancer/webgl/shader_lib';
 import {defineVertexId, VertexIdHelper} from 'neuroglancer/webgl/vertex_id';
+import { binSize } from '../datasource/precomputed/frontend';
 import { hqDefineScale } from '../navigation_state';
 class RenderHelper extends AnnotationRenderHelper {
   private defineShaderCommon(builder: ShaderBuilder) {
@@ -167,8 +168,8 @@ emitAnnotation(vec4(color.rgb, color.a * ${this.getCrossSectionFadeFactor()}));
             numChunkDisplayDims === 2 ? this.shaderGetter2d : this.shaderGetter1d, context,
             shader => {
               const {gl} = shader;
-              let pointsize = 1.0/hqDefineScale;
-              gl.vertexAttrib1f(shader.attribute('aPointSize'),pointsize);
+              let pointsize = 1.0 / hqDefineScale * binSize;
+              gl.vertexAttrib1f(shader.attribute('aPointSize'),pointsize)
               initializeLineShader(
                   shader, context.renderContext.projectionParameters, /*featherWidthInPixels=*/ 1);
               drawLines(shader.gl, 1, context.count);
