@@ -234,6 +234,41 @@ export class LoadedDataSourceView extends RefCounted {
   }
 }
 
+export class SelectBinView extends RefCounted{
+  selectElement = document.createElement('select');
+  inputValue = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0].innerText.split('/');
+  lastParam = this.inputValue.splice(this.inputValue.length - 1, 1)
+  constructor(public source: Borrowed<LoadedLayerDataSource>){
+    super();
+    this.selectElement.classList.add('neuroglancer-layer-side-panel-type-hq');
+    this.selectElement.id = 'hqDefineSelect';
+    this.selectElement.style.width = '100%';
+    this.selectElement.style.height = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0].innerText?'auto':'0px';
+    this.registerDisposer(() => removeFromParent(this.selectElement));
+    let binList = source.dataSource.subsources[0].subsource.annotation?.metadata?.binlist
+    console.log('binlist',binList, this.lastParam, binList.length>0 && binList.includes(this.lastParam), binList.includes(this.lastParam))
+    if(binList.length>0 && binList.includes(this.lastParam[0])){
+      for(let i = 0; i < binList.length; i++){
+        this.selectElement.options.add(new Option(binList[i], binList[i],false, binList[i] === this.lastParam[0]?true:false) );
+      }
+    }
+  }
+
+  onchange = (urlInput: SourceUrlAutocomplete, flag: Boolean = true) => {
+    let objS = document.getElementsByClassName("neuroglancer-layer-side-panel-type-hq")[0]?.value;
+    console.log(objS)
+    this.lastParam = this.inputValue.join('/')+'/'+objS;
+    if(flag){
+      urlInput.setValueAndSelection(this.lastParam);
+      let explicit = true;
+      urlInput.disableCompletion();
+      urlInput.hideCompletions();
+      urlInput.onCommit.dispatch(this.lastParam, explicit);
+    }
+  }
+  
+}
+
 export class DataSourceView extends RefCounted {
   element = document.createElement('div');
   urlInput: SourceUrlAutocomplete;
@@ -241,7 +276,7 @@ export class DataSourceView extends RefCounted {
   seenGeneration = 0;
   generation = -1;
   private loadedView: LoadedDataSourceView|undefined;
-
+  private selectBinView: SelectBinView|undefined;
   constructor(public tab: Borrowed<LayerDataSourcesTab>, public source: Borrowed<LayerDataSource>) {
     super();
     const urlInput = this.urlInput = this.registerDisposer(new SourceUrlAutocomplete(this));
@@ -292,7 +327,7 @@ export class DataSourceView extends RefCounted {
     this.urlInput.value = this.source.spec.url;
     this.urlInput.dirty.value = false;
     const {loadState} = this.source;
-    let {loadedView} = this;
+    let {loadedView, selectBinView} = this;
     if (loadedView !== undefined) {
       if (loadedView.source === loadState) {
         return;
@@ -300,9 +335,18 @@ export class DataSourceView extends RefCounted {
       loadedView.dispose();
       loadedView = this.loadedView = undefined;
     }
+    if (selectBinView !== undefined) {
+      selectBinView.dispose();
+      selectBinView = this.selectBinView = undefined;
+    }
     if (loadState instanceof LoadedLayerDataSource) {
       loadedView = this.loadedView = new LoadedDataSourceView(loadState);
+      selectBinView = this.selectBinView = new SelectBinView(loadState);
+      this.element.appendChild(selectBinView.selectElement)
       this.element.appendChild(loadedView.element);
+      selectBinView.selectElement.onchange =() =>{
+        selectBinView?.onchange(this.urlInput);
+      }
     }
   }
 

@@ -42,7 +42,6 @@ import * as matrix from 'neuroglancer/util/matrix';
 import {getObjectId} from 'neuroglancer/util/object_id';
 import {cancellableFetchSpecialOk, parseSpecialUrl, SpecialProtocolCredentials, SpecialProtocolCredentialsProvider} from 'neuroglancer/util/special_protocol_request';
 import {Uint64} from 'neuroglancer/util/uint64';
-export let binSize: number;
 class PrecomputedVolumeChunkSource extends
 (WithParameters(WithCredentialsProvider<SpecialProtocolCredentials>()(VolumeChunkSource), VolumeChunkSourceParameters)) {}
 
@@ -620,6 +619,7 @@ class AnnotationMetadata {
   coordinateSpace: CoordinateSpace;
   parameters: AnnotationSourceParameters;
   spatialIndices: AnnotationSpatialIndexLevelMetadata[];
+  binlist : string[];
   constructor(public url: string, metadata: any) {
     verifyObject(metadata);
     const baseCoordinateSpace =
@@ -691,6 +691,7 @@ class AnnotationMetadata {
           };
         }));
     this.spatialIndices.reverse();
+    this.binlist = metadata.binlist;
   }
 }
 
@@ -714,9 +715,6 @@ async function getAnnotationDataSource(
       },
     ],
   };
-  let urlParam = url.split('/');
-  let size = urlParam[urlParam.length - 1].includes('bin')? urlParam[urlParam.length - 1].substr(3) : 1;
-  binSize = Number(size);
   return dataSource;
 }
 
