@@ -61,7 +61,7 @@ void setPointMarkerBorderColor(vec4 color) {
 `);
     builder.addVertexMain(`
 ng_markerDiameter = aPointSize;
-ng_markerBorderWidth = 1.0;
+ng_markerBorderWidth = -1.0;
 pointFactor = 1.0;
 opacityFactor = 1.0;
 vBorderColor = vec4(0.0, 0.0, 0.0, 1.0);

@@ -600,11 +600,23 @@ class colorBarView extends Tab {
   changeEdit(arr: any, number: any){
     if(number){
       this.codeWidget.textEditor.setValue(
-        `void main() { setColor(colormapFull(prop_color(), ${arr[0]}, ${arr[1]}, ${arr[2]}, ${arr[3]}, ${arr[4]}, ${arr[5]})); }`
+        `#uicontrol float sizeFactor slider(min=0.0, max=2.0, default=1.0, step=0.01);
+        #uicontrol float oFactor slider(min=0.0, max=1.0, default=1.0, step=0.01);
+        void main() { 
+          setColor(colormapFull(prop_color(), ${arr[0]}, ${arr[1]}, ${arr[2]}, ${arr[3]}, ${arr[4]}, ${arr[5]}));
+          setPointMarkerFactor(sizeFactor);
+          setPointMarkerOpacityFactor(oFactor);
+        }`
       );
     }else{
       this.codeWidget.textEditor.setValue(
-        `void main() { setColor(colormapJet(prop_color())); }`
+        `#uicontrol float sizeFactor slider(min=0.0, max=2.0, default=1.0, step=0.01); 
+        #uicontrol float oFactor slider(min=0.0, max=1.0, default=1.0, step=0.01);
+        void main() { 
+          setColor(colormapJet(prop_color()));
+          setPointMarkerFactor(sizeFactor);
+          setPointMarkerOpacityFactor(oFactor);
+        }`
       );
     }
     this.codeWidget.setValidState(undefined);
