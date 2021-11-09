@@ -39,11 +39,15 @@ class RenderHelper extends AnnotationRenderHelper {
 float ng_markerDiameter;
 float ng_markerBorderWidth;
 float pointFactor;
+float opacityFactor;
 void setPointMarkerSize(float size) {
   ng_markerDiameter = size;
 }
 void setPointMarkerFactor(float size) {
   pointFactor = size;
+}
+void setPointMarkerOpacityFactor(float a){
+  opacityFactor = a;
 }
 void setPointMarkerBorderWidth(float size) {
   ng_markerBorderWidth = size;
@@ -59,6 +63,7 @@ void setPointMarkerBorderColor(vec4 color) {
 ng_markerDiameter = aPointSize;
 ng_markerBorderWidth = 1.0;
 pointFactor = 1.0;
+opacityFactor = 1.0;
 vBorderColor = vec4(0.0, 0.0, 0.0, 1.0);
 float modelPosition[${rank}] = getVertexPosition0();
 float clipCoefficient = getSubspaceClipCoefficient(modelPosition);
@@ -67,7 +72,7 @@ if (clipCoefficient == 0.0) {
   return;
 }
 ${this.invokeUserMain}
-vColor.a *= clipCoefficient;
+vColor.a *= clipCoefficient * opacityFactor;
 vBorderColor.a *= clipCoefficient;
 ${this.setPartIndex(builder)};
 `);
@@ -194,6 +199,7 @@ void setPointMarkerSize(float size) {}
 void setPointMarkerBorderWidth(float size) {}
 void setPointMarkerFactor(float size) {}
 void setPointMarkerColor(vec4 color) {}
+void setPointMarkerOpacityFactor(float a){}
 void setPointMarkerBorderColor(vec4 color) {}
 `);
   },
