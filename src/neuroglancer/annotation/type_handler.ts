@@ -290,6 +290,7 @@ void setPointMarkerColor(vec4 color);
 void setPointMarkerBorderColor(vec4 color);
 void setPointMarkerSize(float size);
 void setPointMarkerBorderWidth(float size);
+void setPointMarkerFactor(float size);
 void setPointMarkerBorderColor(vec3 color) { setPointMarkerBorderColor(vec4(color, 1.0)); }
 
 void setEllipsoidFillColor(vec4 color);

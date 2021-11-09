@@ -38,8 +38,12 @@ class RenderHelper extends AnnotationRenderHelper {
     builder.addVertexCode(`
 float ng_markerDiameter;
 float ng_markerBorderWidth;
+float pointFactor;
 void setPointMarkerSize(float size) {
   ng_markerDiameter = size;
+}
+void setPointMarkerFactor(float size) {
+  pointFactor = size;
 }
 void setPointMarkerBorderWidth(float size) {
   ng_markerBorderWidth = size;
@@ -54,6 +58,7 @@ void setPointMarkerBorderColor(vec4 color) {
     builder.addVertexMain(`
 ng_markerDiameter = aPointSize;
 ng_markerBorderWidth = 1.0;
+pointFactor = 1.0;
 vBorderColor = vec4(0.0, 0.0, 0.0, 1.0);
 float modelPosition[${rank}] = getVertexPosition0();
 float clipCoefficient = getSubspaceClipCoefficient(modelPosition);
@@ -75,7 +80,7 @@ ${this.setPartIndex(builder)};
         this.defineShaderCommon(builder);
         builder.addVertexMain(`
 emitCircle(uModelViewProjection *
-           vec4(projectModelVectorToSubspace(modelPosition), 1.0), ng_markerDiameter, ng_markerBorderWidth);
+           vec4(projectModelVectorToSubspace(modelPosition), 1.0), ng_markerDiameter*pointFactor, ng_markerBorderWidth);
 `);
         builder.setFragmentMain(`
 vec4 color = getCircleColor(vColor, vBorderColor);
@@ -118,7 +123,7 @@ for (int i = 0; i < 3; ++i) {
 if (minZ > maxZ) minZ = maxZ = 0.0;
 subspacePositionA[${extraDim}] = minZ;
 subspacePositionB[${extraDim}] = maxZ;
-emitLine(uModelViewProjection, subspacePositionA, subspacePositionB, ng_markerDiameter, ng_markerBorderWidth);
+emitLine(uModelViewProjection, subspacePositionA, subspacePositionB, ng_markerDiameter*pointFactor, ng_markerBorderWidth);
 `);
         builder.setFragmentMain(`
 vec4 color = getRoundedLineColor(vColor, vBorderColor);
@@ -187,6 +192,7 @@ registerAnnotationTypeRenderHandler<Point>(AnnotationType.POINT, {
     builder.addVertexCode(`
 void setPointMarkerSize(float size) {}
 void setPointMarkerBorderWidth(float size) {}
+void setPointMarkerFactor(float size) {}
 void setPointMarkerColor(vec4 color) {}
 void setPointMarkerBorderColor(vec4 color) {}
 `);
