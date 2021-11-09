@@ -39,6 +39,18 @@ export const glsl_COLORMAPS = (`vec3 colormapJet(float x) {
   return result;
 }
 ` +
+`vec3 colormapLhf(float x, vec3 mincolor, vec3 maxcolor) {
+  float xclamp = clamp(x, 0.0, 1.0);
+  float angle = 2.0 * 3.1415926 * (4.0 / 3.0 + xclamp);
+  vec3 result;
+  float cosangle = cos(angle);
+  float sinangle = sin(angle);
+  result.r = mincolor[0] + sinangle * (maxcolor[0]-mincolor[0]);
+  result.g = mincolor[1] + cosangle * (maxcolor[1]-mincolor[1]);
+  result.b = mincolor[2]*cosangle;
+  return clamp(result, 0.0, 1.0);
+}
+` +
 `vec3 colormapFull(float x, float r1, float g1, float b1, float r2, float g2, float b2) {
   float xclamp = clamp(x, 0.0, 1.0);
   vec3 result;
@@ -47,5 +59,4 @@ export const glsl_COLORMAPS = (`vec3 colormapJet(float x) {
   result.b = b1 + xclamp * (b2-b1);
   return clamp(result, 0.0, 1.0);
 }
-
 `);
