@@ -82,7 +82,7 @@ export class WatchableAnnotationRelationshipStates extends
 
 const DEFAULT_FRAGMENT_MAIN = `
 void main() {
-  setColor(defaultColor());
+  setColor(colormapJet(prop_color()));
 }
 `;
 

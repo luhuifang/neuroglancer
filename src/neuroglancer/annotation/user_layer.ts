@@ -566,8 +566,55 @@ class ShaderCodeOverlay extends Overlay {
   }
 }
 
+class colorBarView extends Tab {
+  codeWidget = this.registerDisposer(makeShaderCodeWidget(this.layer));
+  colorDiv = document.createElement('div')
+  constructor(public layer: AnnotationUserLayer){
+    super();
+    const colorArr = [
+      {colorName: 'RESET', colorText: 'RESET', colorBg: {left: '#000091', right: '#ff1d00'}, colorFloat: [0.001, 0.001, 0.54, 0.999, 0.11, 0.001]},
+      {colorName: 'Viridis', colorText: 'Viridis', colorBg: {left: '#440154', right: '#fde725'}, colorFloat: [0.26, 0.999, 0.33, 0.99, 0.9, 0.14]},
+      {colorName: 'Cividis', colorText: 'Cividis', colorBg: {left: '#00224e', right: '#fee838'}, colorFloat: [0.001, 0.13, 0.3, 0.996, 0.9, 0.21]},
+      {colorName: 'Inferno', colorText: 'Inferno', colorBg: {left: '#000004', right: '#fcffa4'}, colorFloat: [0.001, 0.001, 0.01, 0.98, 0.999, 0.64]},
+      {colorName: 'Plasma', colorText: 'Plasma', colorBg: {left: '#0d0887', right: '#f0f921'}, colorFloat: [0.05, 0.03, 0.52, 0.94, 0.97, 0.12]},
+      {colorName: 'Purples', colorText: 'Purples', colorBg: {left: '#fcfbfd', right: '#3f007d'}, colorFloat: [0.99, 0.98, 0.98, 0.25, 0.001, 0.49]},
+      {colorName: 'Blues', colorText: 'Blues', colorBg: {left: '#f7fbff', right: '#08306b'}, colorFloat: [0.96,0.98, 0.98, 0.03, 0.19, 0.42]},
+      {colorName: 'Greens', colorText: 'Greens', colorBg: {left: '#f7fcf5', right: '#00441b'}, colorFloat: [0.96, 0.99, 0.96, 0.001, 0.27, 0.10]},
+      {colorName: 'Oranges', colorText: 'Oranges', colorBg: {left: '#fff5eb', right: '#7f2704'}, colorFloat: [0.999, 0.96, 0.92, 0.5, 0.15, 0.1]}
+    ]
+    this.colorDiv.id = 'colorBarHq'
+    for(let i = 0; i < colorArr.length; i++){
+      let element = document.createElement('div');
+      let elementText = document.createElement('p');
+      let elementColor = document.createElement('button');
+      elementText.innerHTML = colorArr[i].colorText;
+      this.colorDiv.appendChild(element)
+      element.appendChild(elementText);
+      element.appendChild(elementColor);
+      elementColor.style.backgroundImage = 'linear-gradient(to right, ' + colorArr[i].colorBg.left + ' ,' + colorArr[i].colorBg.right + ')';
+      elementColor.addEventListener('click', ()=>{
+        this.changeEdit(colorArr[i].colorFloat, i)
+      })
+    }
+  }
+  changeEdit(arr: any, number: any){
+    if(number){
+      this.codeWidget.textEditor.setValue(
+        `void main() { setColor(colormapFull(prop_color(), ${arr[0]}, ${arr[1]}, ${arr[2]}, ${arr[3]}, ${arr[4]}, ${arr[5]})); }`
+      );
+    }else{
+      this.codeWidget.textEditor.setValue(
+        `void main() { setColor(colormapJet(prop_color())); }`
+      );
+    }
+    this.codeWidget.setValidState(undefined);
+    // this.codeWidget.debouncedValueUpdater();
+  }
+}
+
 class RenderingOptionsTab extends Tab {
   codeWidget = this.registerDisposer(makeShaderCodeWidget(this.layer));
+  colorBar = this.registerDisposer(new colorBarView(this.layer))
   constructor(public layer: AnnotationUserLayer) {
     super();
     const {element} = this;
@@ -620,6 +667,7 @@ class RenderingOptionsTab extends Tab {
     element.appendChild(topRow);
 
     element.appendChild(this.codeWidget.element);
+    element.appendChild(this.colorBar.colorDiv);
     element.appendChild(this.registerDisposer(new ShaderControls(
                                                   layer.annotationDisplayState.shaderControls,
                                                   this.layer.manager.root.display, this.layer,

@@ -38,4 +38,14 @@ export const glsl_COLORMAPS = (`vec3 colormapJet(float x) {
   result = clamp(xclamp + amp * result, 0.0, 1.0);
   return result;
 }
+` +
+`vec3 colormapFull(float x, float r1, float g1, float b1, float r2, float g2, float b2) {
+  float xclamp = clamp(x, 0.0, 1.0);
+  vec3 result;
+  result.r = r1 + xclamp * (r2-r1);
+  result.g = g1 + xclamp * (g2-g1);
+  result.b = b1 + xclamp * (b2-b1);
+  return clamp(result, 0.0, 1.0);
+}
+
 `);
