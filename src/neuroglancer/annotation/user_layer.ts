@@ -53,6 +53,17 @@ const CROSS_SECTION_RENDER_SCALE_JSON_KEY = 'crossSectionAnnotationSpacing';
 const PROJECTION_RENDER_SCALE_JSON_KEY = 'projectionAnnotationSpacing';
 const SHADER_JSON_KEY = 'shader';
 const SHADER_CONTROLS_JSON_KEY = 'shaderControls';
+let colorArr = [
+  {colorName: 'DEFAULT', colorText: 'DEFAULT', colorBg: {left: '#000091', right: '#ff1d00'}, colorFloat: [0.001, 0.001, 0.54, 0.999, 0.11, 0.001], reversed: false, clicked: true},
+  {colorName: 'Viridis', colorText: 'Viridis', colorBg: {left: '#440154', right: '#fde725'}, colorFloat: [0.26, 0.003, 0.33, 0.99, 0.9, 0.14], reversed: false, clicked: false},
+  {colorName: 'Cividis', colorText: 'Cividis', colorBg: {left: '#00224e', right: '#fee838'}, colorFloat: [0.001, 0.13, 0.3, 0.996, 0.9, 0.21], reversed: false, clicked: false},
+  {colorName: 'Inferno', colorText: 'Inferno', colorBg: {left: '#000004', right: '#fcffa4'}, colorFloat: [0.001, 0.001, 0.01, 0.98, 0.999, 0.64], reversed: false, clicked: false},
+  {colorName: 'Plasma', colorText: 'Plasma', colorBg: {left: '#0d0887', right: '#f0f921'}, colorFloat: [0.05, 0.03, 0.52, 0.94, 0.97, 0.12], reversed: false, clicked: false},
+  {colorName: 'Purples', colorText: 'Purples', colorBg: {left: '#fcfbfd', right: '#3f007d'}, colorFloat: [0.99, 0.98, 0.98, 0.25, 0.001, 0.49], reversed: false, clicked: false},
+  {colorName: 'Blues', colorText: 'Blues', colorBg: {left: '#f7fbff', right: '#08306b'}, colorFloat: [0.96,0.98, 0.98, 0.03, 0.19, 0.42], reversed: false, clicked: false},
+  {colorName: 'Greens', colorText: 'Greens', colorBg: {left: '#f7fcf5', right: '#00441b'}, colorFloat: [0.96, 0.99, 0.96, 0.001, 0.27, 0.10], reversed: false, clicked: false},
+  {colorName: 'Oranges', colorText: 'Oranges', colorBg: {left: '#fff5eb', right: '#7f2704'}, colorFloat: [0.999, 0.96, 0.92, 0.5, 0.15, 0.1], reversed: false, clicked: false}
+]
 
 function addPointAnnotations(annotations: LocalAnnotationSource, obj: any) {
   if (obj === undefined) {
@@ -566,22 +577,53 @@ class ShaderCodeOverlay extends Overlay {
   }
 }
 
+class colorReversed extends Tab {
+  colorBarReversed = this.registerDisposer(new colorBarView(this.layer))
+  colorReversedElement = document.createElement('div')
+  divElement = document.createElement('div')
+  flag = false
+  constructor(public layer: AnnotationUserLayer){
+    super();
+    let span = document.createElement('span');
+    let ReversedText = document.createElement('p')
+    let inputElement = document.createElement('input')
+    ReversedText.innerText = 'Reverse'
+    this.colorReversedElement.classList.add('container')
+    this.divElement.classList.add('el-switch')
+    inputElement.classList.add('el-switch__input');
+    span.classList.add('el-switch__core');
+    this.colorReversedElement.appendChild(this.divElement)
+    this.divElement.appendChild(ReversedText)
+    this.divElement.appendChild(inputElement)
+    this.divElement.appendChild(span)
+    this.divElement.addEventListener('click', ()=>{
+      this.flag = !this.flag
+      if(this.flag){
+        this.divElement.classList.add('is-checked')
+      }else{
+        span.classList.add('unchecked')
+        this.divElement.classList.remove('is-checked')
+      }
+      this.reversed(this.flag)
+    })
+  }
+  reversed(flag:boolean){
+    colorArr.forEach((item, index) =>{
+      item.reversed = flag
+      if(item.clicked){
+        console.log(item)
+        this.colorBarReversed.changeEdit( item, index,)
+      }
+    })
+  }
+}
+
+
 class colorBarView extends Tab {
   codeWidget = this.registerDisposer(makeShaderCodeWidget(this.layer));
   colorDiv = document.createElement('div')
   constructor(public layer: AnnotationUserLayer){
     super();
-    const colorArr = [
-      {colorName: 'RESET', colorText: 'RESET', colorBg: {left: '#000091', right: '#ff1d00'}, colorFloat: [0.001, 0.001, 0.54, 0.999, 0.11, 0.001]},
-      {colorName: 'Viridis', colorText: 'Viridis', colorBg: {left: '#440154', right: '#fde725'}, colorFloat: [0.26, 0.999, 0.33, 0.99, 0.9, 0.14]},
-      {colorName: 'Cividis', colorText: 'Cividis', colorBg: {left: '#00224e', right: '#fee838'}, colorFloat: [0.001, 0.13, 0.3, 0.996, 0.9, 0.21]},
-      {colorName: 'Inferno', colorText: 'Inferno', colorBg: {left: '#000004', right: '#fcffa4'}, colorFloat: [0.001, 0.001, 0.01, 0.98, 0.999, 0.64]},
-      {colorName: 'Plasma', colorText: 'Plasma', colorBg: {left: '#0d0887', right: '#f0f921'}, colorFloat: [0.05, 0.03, 0.52, 0.94, 0.97, 0.12]},
-      {colorName: 'Purples', colorText: 'Purples', colorBg: {left: '#fcfbfd', right: '#3f007d'}, colorFloat: [0.99, 0.98, 0.98, 0.25, 0.001, 0.49]},
-      {colorName: 'Blues', colorText: 'Blues', colorBg: {left: '#f7fbff', right: '#08306b'}, colorFloat: [0.96,0.98, 0.98, 0.03, 0.19, 0.42]},
-      {colorName: 'Greens', colorText: 'Greens', colorBg: {left: '#f7fcf5', right: '#00441b'}, colorFloat: [0.96, 0.99, 0.96, 0.001, 0.27, 0.10]},
-      {colorName: 'Oranges', colorText: 'Oranges', colorBg: {left: '#fff5eb', right: '#7f2704'}, colorFloat: [0.999, 0.96, 0.92, 0.5, 0.15, 0.1]}
-    ]
     this.colorDiv.id = 'colorBarHq'
     for(let i = 0; i < colorArr.length; i++){
       let element = document.createElement('div');
@@ -593,31 +635,47 @@ class colorBarView extends Tab {
       element.appendChild(elementColor);
       elementColor.style.backgroundImage = 'linear-gradient(to right, ' + colorArr[i].colorBg.left + ' ,' + colorArr[i].colorBg.right + ')';
       elementColor.addEventListener('click', ()=>{
-        this.changeEdit(colorArr[i].colorFloat, i)
+        this.changeEdit(colorArr[i], i)
       })
     }
   }
   changeEdit(arr: any, number: any){
+    colorArr.forEach((item, index) =>{
+      item.clicked = index == number ? true : false
+    })
     if(number){
+      let clickColorArr = arr.reversed?[arr.colorFloat[3], arr.colorFloat[4], arr.colorFloat[5], arr.colorFloat[0], arr.colorFloat[1], arr.colorFloat[2]] : [arr.colorFloat[0], arr.colorFloat[1], arr.colorFloat[2], arr.colorFloat[3], arr.colorFloat[4], arr.colorFloat[5]];
       this.codeWidget.textEditor.setValue(
         `#uicontrol float sizeFactor slider(min=0.0, max=2.0, default=1.0, step=0.01);
         #uicontrol float oFactor slider(min=0.0, max=1.0, default=1.0, step=0.01);
         void main() { 
-          setColor(colormapFull(prop_color(), ${arr[0]}, ${arr[1]}, ${arr[2]}, ${arr[3]}, ${arr[4]}, ${arr[5]}));
+          setColor(colormapFull(prop_color(), ${clickColorArr}));
           setPointMarkerFactor(sizeFactor);
           setPointMarkerOpacityFactor(oFactor);
         }`
       );
     }else{
-      this.codeWidget.textEditor.setValue(
-        `#uicontrol float sizeFactor slider(min=0.0, max=2.0, default=1.0, step=0.01); 
+      if(!arr.reversed){
+        this.codeWidget.textEditor.setValue(
+          `#uicontrol float sizeFactor slider(min=0.0, max=2.0, default=1.0, step=0.01); 
         #uicontrol float oFactor slider(min=0.0, max=1.0, default=1.0, step=0.01);
         void main() { 
           setColor(colormapJet(prop_color()));
           setPointMarkerFactor(sizeFactor);
           setPointMarkerOpacityFactor(oFactor);
         }`
-      );
+        );
+      }else{
+        this.codeWidget.textEditor.setValue(
+          `#uicontrol float sizeFactor slider(min=0.0, max=2.0, default=1.0, step=0.01); 
+          #uicontrol float oFactor slider(min=0.0, max=1.0, default=1.0, step=0.01);
+          void main() { 
+            setColor(colormap2(prop_color()));
+            setPointMarkerFactor(sizeFactor);
+            setPointMarkerOpacityFactor(oFactor);
+          }`
+        );
+      }
     }
     this.codeWidget.setValidState(undefined);
     // this.codeWidget.debouncedValueUpdater();
@@ -627,6 +685,7 @@ class colorBarView extends Tab {
 class RenderingOptionsTab extends Tab {
   codeWidget = this.registerDisposer(makeShaderCodeWidget(this.layer));
   colorBar = this.registerDisposer(new colorBarView(this.layer))
+  colorReverse = this.registerDisposer(new colorReversed(this.layer))
   constructor(public layer: AnnotationUserLayer) {
     super();
     const {element} = this;
@@ -679,6 +738,7 @@ class RenderingOptionsTab extends Tab {
     element.appendChild(topRow);
 
     element.appendChild(this.codeWidget.element);
+    element.appendChild(this.colorReverse.colorReversedElement);
     element.appendChild(this.colorBar.colorDiv);
     element.appendChild(this.registerDisposer(new ShaderControls(
                                                   layer.annotationDisplayState.shaderControls,
