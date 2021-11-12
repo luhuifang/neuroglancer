@@ -166,6 +166,12 @@ emitAnnotation(vec4(color.rgb, color.a * ${this.getCrossSectionFadeFactor()}));
     switch (numChunkDisplayDims) {
       case 3:
         this.enable(this.shaderGetter3d, context, shader => {
+          const {gl} = shader;
+          let isBin = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0].innerText.includes('bin')
+          let binSizes:any = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0]?.innerText.split('/')
+          binSizes = isBin ? Number(binSizes[binSizes.length -1].substr(3)): 1.0
+          let pointsize = 1.0 / hqDefineScale * binSizes;
+          gl.vertexAttrib1f(shader.attribute('aPointSize'),pointsize)
           initializeCircleShader(
               shader, context.renderContext.projectionParameters, {featherWidthInPixels: 1});
           drawCircles(shader.gl, 1, context.count);
@@ -177,8 +183,9 @@ emitAnnotation(vec4(color.rgb, color.a * ${this.getCrossSectionFadeFactor()}));
             numChunkDisplayDims === 2 ? this.shaderGetter2d : this.shaderGetter1d, context,
             shader => {
               const {gl} = shader;
+              let isBin = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0].innerText.includes('bin')
               let binSizes:any = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0]?.innerText.split('/')
-              binSizes = Number(binSizes[binSizes.length -1].substr(3))
+              binSizes = isBin ? Number(binSizes[binSizes.length -1].substr(3)): 1.0
               let pointsize = 1.0 / hqDefineScale * binSizes;
               gl.vertexAttrib1f(shader.attribute('aPointSize'),pointsize)
               initializeLineShader(

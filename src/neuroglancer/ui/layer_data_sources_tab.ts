@@ -243,11 +243,10 @@ export class SelectBinView extends RefCounted{
     this.selectElement.classList.add('neuroglancer-layer-side-panel-type-hq');
     this.selectElement.id = 'hqDefineSelect';
     this.selectElement.style.width = '100%';
-    this.selectElement.style.height = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0].innerText?'auto':'0px';
     this.registerDisposer(() => removeFromParent(this.selectElement));
     let binList = source.dataSource.subsources[0].subsource.annotation?.metadata?.binlist
-    console.log('binlist',binList, this.lastParam, binList.length>0 && binList.includes(this.lastParam), binList.includes(this.lastParam))
-    if(binList.length>0 && binList.includes(this.lastParam[0])){
+    this.selectElement.style.display = binList?'block':'none';
+    if(binList && binList.length>0 && binList.includes(this.lastParam[0])){
       for(let i = 0; i < binList.length; i++){
         this.selectElement.options.add(new Option(binList[i], binList[i],false, binList[i] === this.lastParam[0]?true:false) );
       }
