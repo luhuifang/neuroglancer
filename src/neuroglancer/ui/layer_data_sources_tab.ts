@@ -246,7 +246,7 @@ export class SelectBinView extends RefCounted{
     let binList = source.dataSource.subsources[0].subsource.annotation?.metadata?.binlist
     this.selectElement.style.display = binList?'block':'none';
     this.registerDisposer(() => removeFromParent(this.selectElement));
-    if(binList.length>0 && binList.includes(this.lastParam[0])){
+    if(binList?.length>0 && binList.includes(this.lastParam[0])){
       for(let i = 0; i < binList.length; i++){
         this.selectElement.options.add(new Option(binList[i], binList[i],false, binList[i] === this.lastParam[0]?true:false) );
       }

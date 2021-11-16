@@ -167,9 +167,15 @@ emitAnnotation(vec4(color.rgb, color.a * ${this.getCrossSectionFadeFactor()}));
       case 3:
         this.enable(this.shaderGetter3d, context, shader => {
           const {gl} = shader;
+<<<<<<< HEAD
           let isBin = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0].innerText.includes('bin');
           let binSizes:any = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0]?.innerText.split('/')
           binSizes = isBin ? Number(binSizes[binSizes.length -1].substr(3)): 1.0;
+=======
+          let isBin = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0].innerText.includes('bin')
+          let binSizes:any = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0]?.innerText.split('/')
+          binSizes = isBin ? Number(binSizes[binSizes.length -1].substr(3)): 1.0
+>>>>>>> 5624c3df636faaf8455655211ef28c3cce4f7925
           let pointsize = 1.0 / hqDefineScale * binSizes;
           gl.vertexAttrib1f(shader.attribute('aPointSize'),pointsize)
           initializeCircleShader(
@@ -183,9 +189,15 @@ emitAnnotation(vec4(color.rgb, color.a * ${this.getCrossSectionFadeFactor()}));
             numChunkDisplayDims === 2 ? this.shaderGetter2d : this.shaderGetter1d, context,
             shader => {
               const {gl} = shader;
+<<<<<<< HEAD
               let isBin = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0].innerText.includes('bin');
               let binSizes:any = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0]?.innerText.split('/')
               binSizes = isBin ? Number(binSizes[binSizes.length -1].substr(3)): 1.0;
+=======
+              let isBin = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0].innerText.includes('bin')
+              let binSizes:any = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0]?.innerText.split('/')
+              binSizes = isBin ? Number(binSizes[binSizes.length -1].substr(3)): 1.0
+>>>>>>> 5624c3df636faaf8455655211ef28c3cce4f7925
               let pointsize = 1.0 / hqDefineScale * binSizes;
               gl.vertexAttrib1f(shader.attribute('aPointSize'),pointsize)
               initializeLineShader(
