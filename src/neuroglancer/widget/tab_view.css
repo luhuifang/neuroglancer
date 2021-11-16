@@ -31,9 +31,9 @@
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   border-bottom: none;
-  margin-right: 4px;
+  margin-right: 3px;
   padding-top: 1px;
-  padding-left: 2px;
+  /* padding-left: 2px; */
   padding-right: 2px;
   font: 10pt sans-serif;
   font-weight: bold;

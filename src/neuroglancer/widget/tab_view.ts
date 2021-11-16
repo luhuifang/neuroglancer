@@ -292,6 +292,8 @@ export class TabView extends RefCounted {
       public visibility = new WatchableVisibilityPriority(WatchableVisibilityPriority.VISIBLE)) {
     super();
     this.tabs = options.tabs;
+    // this.tabs.value.push({id: 'Gene Table', label: 'Gene Table'})
+    console.log('options.tabs',options)
     this.selectedTab = options.selectedTab;
     this.handleTabElement = options.handleTabElement;
     const {element, tabBar} = this;

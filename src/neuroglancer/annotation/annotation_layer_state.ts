@@ -80,13 +80,11 @@ export class WatchableAnnotationRelationshipStates extends
   }
 }
 
+// #uicontrol float sizeFactor slider(min=0.0, max=2.0, default=1.0, step=0.01);
+// #uicontrol float oFactor slider(min=0.0, max=1.0, default=1.0, step=0.01);
 const DEFAULT_FRAGMENT_MAIN = `
-#uicontrol float sizeFactor slider(min=0.0, max=2.0, default=1.0, step=0.01);
-#uicontrol float oFactor slider(min=0.0, max=1.0, default=1.0, step=0.01);
 void main() {
   setColor(colormapJet(prop_color()));
-  setPointMarkerFactor(sizeFactor);
-  setPointMarkerOpacityFactor(oFactor);
 }
 `;
 
