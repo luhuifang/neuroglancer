@@ -33,6 +33,7 @@ export class CheckboxIcon extends RefCounted {
     this.element = makeIcon({
       ...options,
       onClick: () => {
+        console.log('model.value',model.value)
         model.value = !model.value;
       },
     });

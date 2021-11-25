@@ -39,10 +39,11 @@ import {CoordinateSpaceTransformWidget} from 'neuroglancer/widget/coordinate_tra
 import {AutocompleteTextInput, makeCompletionElementWithDescription} from 'neuroglancer/widget/multiline_autocomplete';
 import {Tab} from 'neuroglancer/widget/tab_view';
 
-class SourceUrlAutocomplete extends AutocompleteTextInput {
+export class SourceUrlAutocomplete extends AutocompleteTextInput {
   dataSourceView: DataSourceView;
   dirty: WatchableValueInterface<boolean>;
   constructor(dataSourceView: DataSourceView) {
+    console.log(dataSourceView)
     const {manager} = dataSourceView.source.layer;
     const sourceCompleter = (value: string, cancellationToken: CancellationToken) =>
         manager.dataSourceProviderRegistry
@@ -236,8 +237,8 @@ export class LoadedDataSourceView extends RefCounted {
 
 export class SelectBinView extends RefCounted{
   selectElement = document.createElement('select');
-  inputValue = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0].innerText.split('/');
-  lastParam = this.inputValue.splice(this.inputValue.length - 1, 1)
+  inputValue = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText.split('/');
+  lastParam:any = this.inputValue.splice(this.inputValue.length - 1, 1)
   constructor(public source: Borrowed<LoadedLayerDataSource>){
     super();
     this.selectElement.classList.add('neuroglancer-layer-side-panel-type-hq');
@@ -254,7 +255,7 @@ export class SelectBinView extends RefCounted{
   }
 
   onchange = (urlInput: SourceUrlAutocomplete, flag: Boolean = true) => {
-    let objS = document.getElementsByClassName("neuroglancer-layer-side-panel-type-hq")[0]?.value;
+    let objS = (document.getElementsByClassName("neuroglancer-layer-side-panel-type-hq")[0] as HTMLInputElement).value;
     console.log(objS)
     this.lastParam = this.inputValue.join('/')+'/'+objS;
     if(flag){
@@ -278,6 +279,7 @@ export class DataSourceView extends RefCounted {
   private selectBinView: SelectBinView|undefined;
   constructor(public tab: Borrowed<LayerDataSourcesTab>, public source: Borrowed<LayerDataSource>) {
     super();
+    console.log(tab, source)
     const urlInput = this.urlInput = this.registerDisposer(new SourceUrlAutocomplete(this));
 
     const updateUrlFromView = (url: string, explicit: boolean) => {
@@ -381,6 +383,7 @@ export class LayerDataSourcesTab extends Tab {
   
   constructor(public layer: Borrowed<UserLayer>) {
     super();
+    console.log(layer)
     const {element, dataSourcesContainer} = this;
     element.classList.add('neuroglancer-layer-data-sources-tab');
     dataSourcesContainer.classList.add('neuroglancer-layer-data-sources-container');
@@ -465,6 +468,7 @@ export class LayerDataSourcesTab extends Tab {
           let view = sourceViews.get(source);
           if (view === undefined) {
             view = new DataSourceView(this, source);
+            console.log(this)
             view.registerDisposer(view.urlInput.dirty.changed.add(this.reRender));
             sourceViews.set(source, view);
           }

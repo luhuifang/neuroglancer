@@ -120,6 +120,7 @@ export class SidePanel extends RefCounted {
     this.location.visible = false;
   }
 
+  // 添加左侧图层title
   addTitleBar(options: {title?: string}) {
     const titleBar = document.createElement('div');
     titleBar.classList.add('neuroglancer-side-panel-titlebar');
@@ -197,6 +198,7 @@ export interface RegisteredSidePanel {
 export class SidePanelManager extends RefCounted {
   public element = document.createElement('div');
   public centerColumn = document.createElement('div');
+  public geneColumn = document.createElement('div');
   beforeRender = new Signal();
   private sides: Record<Side, SidePanelSideState> = {
     'left': this.makeSidePanelSideState('left'),
@@ -286,6 +288,7 @@ export class SidePanelManager extends RefCounted {
       element.style[MARGIN_FOR_SIDE[OPPOSITE_SIDE[zoneSide]]] = `-${size}px`;
     }
     element.addEventListener('dragenter', event => {
+      console.log('dragenter')
       if (!this.hasDroppablePanel()) return;
       element.classList.add(DRAG_OVER_CLASSNAME);
       event.preventDefault();
@@ -375,6 +378,7 @@ export class SidePanelManager extends RefCounted {
     updateChildren(this.centerColumn, getColumnChildren());
   }
 
+  // 添加纵向拖动轴
   private makeCrossGutter(side: Side, crossIndex: number) {
     const gutter = document.createElement('div');
     gutter.style.position = 'relative';
@@ -418,6 +422,7 @@ export class SidePanelManager extends RefCounted {
     return gutter;
   }
 
+  // 添加横向拖动轴
   private makeFlexGutter(side: Side, crossIndex: number, flexIndex: number) {
     const gutter = document.createElement('div');
     gutter.style.position = 'relative';
@@ -493,6 +498,7 @@ export class SidePanelManager extends RefCounted {
     return gutter;
   }
 
+  // 添加多个右侧面板
   private renderSide(side: Side, flexGroups: SidePanelFlex[], panels: RegisteredSidePanel[]) {
     const flexKey = LOCATION_KEY_FOR_DIRECTION[CROSS_DIRECTION_FOR_SIDE[side]];
     const crossKey = LOCATION_KEY_FOR_DIRECTION[FLEX_DIRECTION_FOR_SIDE[side]];

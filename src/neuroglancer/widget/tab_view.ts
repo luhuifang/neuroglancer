@@ -38,6 +38,7 @@ export class Tab extends RefCounted {
   constructor(
       public visibility = new WatchableVisibilityPriority(WatchableVisibilityPriority.VISIBLE)) {
     super();
+    console.log(visibility)
     const {element} = this;
     element.classList.add('neuroglancer-tab-content');
   }
@@ -293,7 +294,6 @@ export class TabView extends RefCounted {
     super();
     this.tabs = options.tabs;
     // this.tabs.value.push({id: 'Gene Table', label: 'Gene Table'})
-    console.log('options.tabs',options)
     this.selectedTab = options.selectedTab;
     this.handleTabElement = options.handleTabElement;
     const {element, tabBar} = this;
