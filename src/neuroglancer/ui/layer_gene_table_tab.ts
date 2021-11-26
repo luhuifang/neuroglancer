@@ -64,10 +64,16 @@ export class GeneTabView extends RefCounted {
         E10Span.classList.add('caret-wrapper')
         countSortASC.classList.add('sort-caret', 'ascending', 'MIDcount')
         countSortDESC.classList.add('sort-caret', 'descending', 'MIDcount')
-        geneSortASC.classList.add('sort-caret', 'ascending', 'geneid')
-        geneSortDESC.classList.add('sort-caret', 'descending', 'geneid')
+        countSortASC.setAttribute('dataFlag', 'false')
+        countSortDESC.setAttribute('dataFlag', 'false')
+        geneSortASC.classList.add('sort-caret', 'ascending', 'gene')
+        geneSortASC.setAttribute('dataFlag', 'false')
+        geneSortDESC.classList.add('sort-caret', 'descending', 'gene')
+        geneSortDESC.setAttribute('dataFlag', 'false')
         E10SortASC.classList.add('sort-caret', 'ascending', 'E10')
         E10SortDESC.classList.add('sort-caret', 'descending', 'E10')
+        E10SortDESC.setAttribute('dataFlag', 'false')
+        E10SortASC.setAttribute('dataFlag', 'false')
         geneSort.innerText = 'Gene'
         geneSpan.appendChild(geneSortASC)
         geneSpan.appendChild(geneSortDESC)
@@ -91,12 +97,14 @@ export class GeneTabView extends RefCounted {
                 TableHead.getElementsByTagName('i')[3].style.borderTopColor = '#c0c4cc'
                 TableHead.getElementsByTagName('i')[4].style.borderBottomColor = '#c0c4cc'
                 TableHead.getElementsByTagName('i')[5].style.borderTopColor = '#c0c4cc'
+                const dataFlag = (event.target as Element).getAttribute('dataFlag')
+                TableHead.getElementsByTagName('i')[i].setAttribute('dataFlag', dataFlag === 'true'?'false':'true')
             if( (event.target as Element).classList.contains('ascending')){
-                TableHead.getElementsByTagName('i')[i].style.borderBottomColor = '#409eff'
+                TableHead.getElementsByTagName('i')[i].style.borderBottomColor = dataFlag === 'true'? '#c0c4cc':'#409eff'
             }else{
-                TableHead.getElementsByTagName('i')[i].style.borderTopColor = '#409eff'
+                TableHead.getElementsByTagName('i')[i].style.borderTopColor = dataFlag === 'true'? '#c0c4cc':'#409eff'
             }
-            this.sortname = (event.target as Element).classList[2]
+            this.sortname = dataFlag === 'true' ?'' :(event.target as Element).classList[2]
             this.isasc = (event.target as Element).classList[1] == 'ascending'
             this.initGeneTable()
             })
