@@ -1,10 +1,26 @@
-.neuroglancer-annotation-geneTable-tab{width:100%;}
+.neuroglancer-annotation-geneTable-tab{    
+    width: 15%;
+    position: fixed !important;
+    left: 0;
+    top: 46px;
+    background-color: #fff;
+    height: 100%;
+}
+.neuroglancer-annotation-geneTable-tab-new{
+    width: 100%;
+}
+.neuroglancer-tab-gene-view-bar{padding: 2px;border: 1px solid #fff;background-color: #339933;}
 .neuroglancer-annotation-geneTable-tab .geneTable-head{
 	display: flex;
 	justify-content: space-around;
 	border: 1px solid #fff;
+    color: #909399;
+    font-size: 14px;
+    font-weight: bold;
 }
-
+.neuroglancer-annotation-geneTable-tab .el-table{
+    border: 1px solid #ebebeb;
+ }
 .dash-select-cell input{
 	width:18px;
 	height:18px;
@@ -97,7 +113,7 @@
     border-top-color: #c0c4cc;
     bottom: 7px;
 }
-.neuroglancer-annotation-geneTable-tab input{width: 100%;}
+.neuroglancer-annotation-geneTable-tab input{width: 98%;}
 .neuroglancer-annotation-geneTable-tab .el-table input{width: auto}
 tr {
     display: table-row;
@@ -105,10 +121,16 @@ tr {
     border-color: inherit;
 }
 
-.el-table{width: 100%; border-spacing: 0px;padding: 4px	 5px;}
+.el-table{width: 100%; border-spacing: 0px;padding: 4px	5px;}
+.el-table tr:hover>td {
+    background-color: #e6ebf1;
+    cursor: pointer;
+}
+.el-table .success-row {
+    background: #c2e5af;
+}
 .el-table tr{padding: 0 10px;}
 .el-table td {
-    border-bottom: 1px solid #ebeef5;
 	padding: 5px 0;
 	min-width: 0;
 	box-sizing: border-box;
@@ -116,6 +138,9 @@ tr {
 	vertical-align: middle;
 	position: relative;
 	text-align: left;
+    color: #606266;
+    font-size: 14px;
+    border-bottom: 1px solid #cfd0d1;
 }
 
 .el-table td.el-table__cell div {box-sizing: border-box;}
@@ -194,8 +219,39 @@ tr {
 .el-pagination .el-pager input{	width: 30%;text-align: center;}
 .el-pagination .el-pager p {
     margin: 0 5px;
-    color: #fff;
+    color: #606266;
 	width: 30%;
 	font-size: 15px;
     text-align: center;
+}
+
+.neuroglancer-annotation-geneTable-tab .el-button {
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #dcdfe6;
+    color: #606266;
+    -webkit-appearance: none;
+    text-align: center;
+    box-sizing: border-box;
+    outline: none;
+    margin: 0;
+    transition: .1s;
+    font-weight: 500;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    padding: 12px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    width: 50%;
+    margin: auto auto;
+}
+
+.neuroglancer-annotation-geneTable-tab .el-button.is-plain:focus, .el-button.is-plain:hover {
+    background: #fff;
+    border-color: #409eff;
+    color: #409eff;
 }

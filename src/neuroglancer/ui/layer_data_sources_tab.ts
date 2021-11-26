@@ -256,7 +256,7 @@ export class SelectBinView extends RefCounted{
 
   onchange = (urlInput: SourceUrlAutocomplete, flag: Boolean = true) => {
     let objS = (document.getElementsByClassName("neuroglancer-layer-side-panel-type-hq")[0] as HTMLInputElement).value;
-    console.log(objS)
+    console.log(urlInput)
     this.lastParam = this.inputValue.join('/')+'/'+objS;
     if(flag){
       urlInput.setValueAndSelection(this.lastParam);
@@ -279,9 +279,7 @@ export class DataSourceView extends RefCounted {
   private selectBinView: SelectBinView|undefined;
   constructor(public tab: Borrowed<LayerDataSourcesTab>, public source: Borrowed<LayerDataSource>) {
     super();
-    console.log(tab, source)
     const urlInput = this.urlInput = this.registerDisposer(new SourceUrlAutocomplete(this));
-
     const updateUrlFromView = (url: string, explicit: boolean) => {
       const {source} = this;
       const existingSpec = source.spec;
@@ -374,7 +372,7 @@ function changeLayerTypeToDetected(userLayer: UserLayer) {
 
 export class LayerDataSourcesTab extends Tab {
   generation = -1;
-  private sourceViews = new Map<LayerDataSource, DataSourceView>();
+  sourceViews = new Map<LayerDataSource, DataSourceView>();
   private addDataSourceIcon = makeAddButton({title: 'Add additional data source'});
   private layerTypeDetection = document.createElement('div');
   private layerTypeElement = document.createElement('span');
@@ -383,7 +381,6 @@ export class LayerDataSourcesTab extends Tab {
   
   constructor(public layer: Borrowed<UserLayer>) {
     super();
-    console.log(layer)
     const {element, dataSourcesContainer} = this;
     element.classList.add('neuroglancer-layer-data-sources-tab');
     dataSourcesContainer.classList.add('neuroglancer-layer-data-sources-container');
@@ -467,7 +464,7 @@ export class LayerDataSourcesTab extends Tab {
         for (const source of dataSources) {
           let view = sourceViews.get(source);
           if (view === undefined) {
-            view = new DataSourceView(this, source);
+            view = new DataSourceView(this, source); // urlInput
             console.log(this)
             view.registerDisposer(view.urlInput.dirty.changed.add(this.reRender));
             sourceViews.set(source, view);

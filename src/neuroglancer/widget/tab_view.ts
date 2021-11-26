@@ -27,6 +27,7 @@ import {removeChildren, removeFromParent} from 'neuroglancer/util/dom';
 import {NullarySignal, Signal} from 'neuroglancer/util/signal';
 import {Trackable} from 'neuroglancer/util/trackable';
 import {WatchableVisibilityPriority} from 'neuroglancer/visibility_priority/frontend';
+import { LayerDataSourcesTab } from '../ui/layer_data_sources_tab';
 
 export class Tab extends RefCounted {
   element = document.createElement('div');
@@ -152,7 +153,7 @@ export class StackView<TabId, TabType extends Tab = Tab> extends RefCounted {
   tabVisibilityChanged = new Signal<(id: TabId, visible: boolean) => void>();
 
   private displayedTab: TabId|undefined;
-
+  sourceTab: LayerDataSourcesTab;
   get visible() {
     return this.visibility.visible;
   }
@@ -204,8 +205,15 @@ export class StackView<TabId, TabType extends Tab = Tab> extends RefCounted {
   private showTab(id: TabId) {
     const {tabs} = this;
     let tab = tabs.get(id);
+    let that = this
     if (tab === undefined) {
       tab = this.getter(id);
+      //如果 id='source'
+      // tab ： LayerDataSourcesTab 
+      // 用于导出urlInput实例
+      if(tab instanceof LayerDataSourcesTab){
+        that.sourceTab = tab
+      }
       this.element.appendChild(tab.element);
       tabs.set(id, tab);
     }
@@ -277,7 +285,7 @@ export class TabView extends RefCounted {
   selectedTab: WatchableValueInterface<string|undefined>;
   private handleTabElement: ((id: string, element: HTMLElement) => void)|undefined;
 
-  private stack: StackView<string>;
+  stack: StackView<string>;
   private tabLabels = new Map<string, HTMLElement>();
   private tabsGeneration = -1;
 
@@ -293,12 +301,12 @@ export class TabView extends RefCounted {
       public visibility = new WatchableVisibilityPriority(WatchableVisibilityPriority.VISIBLE)) {
     super();
     this.tabs = options.tabs;
-    // this.tabs.value.push({id: 'Gene Table', label: 'Gene Table'})
     this.selectedTab = options.selectedTab;
     this.handleTabElement = options.handleTabElement;
     const {element, tabBar} = this;
     element.className = 'neuroglancer-tab-view';
     tabBar.className = 'neuroglancer-tab-view-bar';
+    console.log(this)
     element.appendChild(tabBar);
     this.registerDisposer(visibility.changed.add(this.debouncedUpdateView));
     const stack = this.stack = this.registerDisposer(new StackView<string>(

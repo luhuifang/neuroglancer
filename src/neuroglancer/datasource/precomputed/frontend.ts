@@ -694,7 +694,6 @@ class AnnotationMetadata {
     this.spatialIndices.reverse();
     this.binlist = metadata.binlist;
     this.genelist = metadata.genelist;
-    console.log('geneList')
   }
 }
 

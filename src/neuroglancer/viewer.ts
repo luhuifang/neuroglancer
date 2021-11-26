@@ -605,15 +605,7 @@ export class Viewer extends RefCounted implements ViewerState {
     {
       const {settingsPanelState} = this;
       const button =
-          this.registerDisposer(new CheckboxIcon({
-            get value() {
-              return settingsPanelState.location.visible;
-            },
-            set value(visible: boolean) {
-              settingsPanelState.location.visible = visible;
-            },
-            changed: settingsPanelState.location.locationChanged,
-          }, {
+          this.registerDisposer(new CheckboxIcon(settingsPanelState.location.watchableVisible, {
             svg: svg_settings,
             backgroundScheme: 'dark',
             enableTitle: 'Show settings panel',

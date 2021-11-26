@@ -33,11 +33,14 @@ import {EventActionMap} from 'neuroglancer/util/mouse_bindings';
 import {CheckboxIcon} from 'neuroglancer/widget/checkbox_icon';
 import {makeDeleteButton} from 'neuroglancer/widget/delete_button';
 import {TabView} from 'neuroglancer/widget/tab_view';
+import {GeneTabView} from 'neuroglancer/ui/layer_gene_table_tab'
+import { DataSourceView, SourceUrlAutocomplete } from './layer_data_sources_tab';
 
 const layerNameInputEventMap = EventActionMap.fromObject({
   'escape': {action: 'cancel'},
 });
-
+let geneIdClickCount:number = 0;
+let resetUrl:any;
 export class LayerNameWidget extends RefCounted {
   element = document.createElement('input');
   constructor(public layer: ManagedUserLayer) {
@@ -111,7 +114,10 @@ export class LayerTypeWidget extends RefCounted {
 
 class LayerSidePanel extends SidePanel {
   tabView: TabView;
+  geneView: GeneTabView;
   layer: UserLayer;
+  DataSourceView: DataSourceView;
+  urlInput: SourceUrlAutocomplete;
   constructor(sidePanelManager: SidePanelManager, public panelState: UserLayerSidePanelState) {
     super(sidePanelManager, panelState.location);
     const layer = this.layer = panelState.layer;
@@ -228,12 +234,47 @@ class LayerSidePanel extends SidePanel {
           },
         },
         this.visibility);
+    if(this.tabView.stack.sourceTab !==undefined){
+      let sourceViews = this.tabView.stack.sourceTab.sourceViews;
+      sourceViews.forEach((v) => {
+        if(v instanceof DataSourceView){
+          this.urlInput = v.urlInput
+        }
+      })
+    }
+    this.geneView = new GeneTabView()
     this.tabView.element.style.flex = '1';
     this.tabView.element.classList.add('neuroglancer-layer-side-panel-tab-view');
     this.tabView.element.style.position = 'relative';
     this.tabView.element.appendChild(this.makeTabDropZone());
     this.addBody(this.tabView.element);
-
+    this.geneView.tbody.addEventListener('click', (event:Event) =>{
+      geneIdClickCount++;
+      if(geneIdClickCount === 1){
+        resetUrl = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText
+      }
+      if(document.getElementsByClassName('success-row')[0]){
+        document.getElementsByClassName('success-row')[0].className = ''
+      }
+      if((event.target as Element).parentElement?.parentElement?.localName === 'tr'){
+        (event.target as Element).parentElement?.parentElement?.classList.add('success-row')
+      }
+      if((event.target as Element).localName === 'input'){
+        return
+      }else{
+        this.changeGeneId( this.urlInput, (event.target as Element).attributes[1].value)
+      }
+    })
+    this.geneView.button.addEventListener('click',()=>{
+      document.getElementsByClassName('success-row')[0].className = ''
+      this.changeGeneId( this.urlInput, resetUrl, true);
+    })
+    // console.log((document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText)
+    this.geneView.element.style.flex = '1';
+    this.geneView.element.classList.add('neuroglancer-layer-side-panel-tab-view');
+    this.geneView.element.style.position = 'relative';
+    this.geneView.element.appendChild(this.makeTabDropZone());
+    this.addBody(this.geneView.element);
     // Hide panel automatically if there are no tabs to display (because they have all been moved to
     // another panel).
     this.registerDisposer(panelState.tabsChanged.add(() => {
@@ -241,6 +282,22 @@ class LayerSidePanel extends SidePanel {
         this.location.visible = false;
       }
     }));
+  }
+  changeGeneId(urlInput: SourceUrlAutocomplete, value:any, flag:boolean = false){
+    let lastParam:any = ''
+    if(!flag){
+      let inputValue = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText?.split('/');
+      let num = inputValue.includes('bin')?1:2
+      inputValue.splice(inputValue.indexOf('annotation') + 1, inputValue.length - num - inputValue.indexOf('annotation'), 'gene/'+value)
+      lastParam = inputValue.join('/')
+    }else{
+      lastParam = value
+    }
+    urlInput.setValueAndSelection(lastParam)
+    let explicit = true;
+    urlInput.disableCompletion();
+    urlInput.hideCompletions();
+    urlInput.onCommit.dispatch(lastParam, explicit);
   }
 
   makeDragSource(): DragSource {
