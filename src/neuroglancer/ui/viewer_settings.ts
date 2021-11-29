@@ -15,6 +15,7 @@
  */
 
 import './viewer_settings.css';
+import './layer_gene_table_tab.css';
 
 import {TrackableBooleanCheckbox} from 'neuroglancer/trackable_boolean';
 import {TrackableValue, WatchableValueInterface} from 'neuroglancer/trackable_value';

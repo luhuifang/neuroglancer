@@ -39,10 +39,11 @@ import {CoordinateSpaceTransformWidget} from 'neuroglancer/widget/coordinate_tra
 import {AutocompleteTextInput, makeCompletionElementWithDescription} from 'neuroglancer/widget/multiline_autocomplete';
 import {Tab} from 'neuroglancer/widget/tab_view';
 
-class SourceUrlAutocomplete extends AutocompleteTextInput {
+export class SourceUrlAutocomplete extends AutocompleteTextInput {
   dataSourceView: DataSourceView;
   dirty: WatchableValueInterface<boolean>;
   constructor(dataSourceView: DataSourceView) {
+    console.log(dataSourceView)
     const {manager} = dataSourceView.source.layer;
     const sourceCompleter = (value: string, cancellationToken: CancellationToken) =>
         manager.dataSourceProviderRegistry
@@ -236,8 +237,8 @@ export class LoadedDataSourceView extends RefCounted {
 
 export class SelectBinView extends RefCounted{
   selectElement = document.createElement('select');
-  inputValue = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0].innerText.split('/');
-  lastParam = this.inputValue.splice(this.inputValue.length - 1, 1)
+  inputValue = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText.split('/');
+  lastParam:any = this.inputValue.splice(this.inputValue.length - 1, 1)
   constructor(public source: Borrowed<LoadedLayerDataSource>){
     super();
     this.selectElement.classList.add('neuroglancer-layer-side-panel-type-hq');
@@ -254,8 +255,8 @@ export class SelectBinView extends RefCounted{
   }
 
   onchange = (urlInput: SourceUrlAutocomplete, flag: Boolean = true) => {
-    let objS = document.getElementsByClassName("neuroglancer-layer-side-panel-type-hq")[0]?.value;
-    console.log(objS)
+    let objS = (document.getElementsByClassName("neuroglancer-layer-side-panel-type-hq")[0] as HTMLInputElement).value;
+    console.log(urlInput)
     this.lastParam = this.inputValue.join('/')+'/'+objS;
     if(flag){
       urlInput.setValueAndSelection(this.lastParam);
@@ -279,7 +280,6 @@ export class DataSourceView extends RefCounted {
   constructor(public tab: Borrowed<LayerDataSourcesTab>, public source: Borrowed<LayerDataSource>) {
     super();
     const urlInput = this.urlInput = this.registerDisposer(new SourceUrlAutocomplete(this));
-
     const updateUrlFromView = (url: string, explicit: boolean) => {
       const {source} = this;
       const existingSpec = source.spec;
@@ -372,7 +372,7 @@ function changeLayerTypeToDetected(userLayer: UserLayer) {
 
 export class LayerDataSourcesTab extends Tab {
   generation = -1;
-  private sourceViews = new Map<LayerDataSource, DataSourceView>();
+  sourceViews = new Map<LayerDataSource, DataSourceView>();
   private addDataSourceIcon = makeAddButton({title: 'Add additional data source'});
   private layerTypeDetection = document.createElement('div');
   private layerTypeElement = document.createElement('span');
@@ -464,7 +464,8 @@ export class LayerDataSourcesTab extends Tab {
         for (const source of dataSources) {
           let view = sourceViews.get(source);
           if (view === undefined) {
-            view = new DataSourceView(this, source);
+            view = new DataSourceView(this, source); // urlInput
+            console.log(this)
             view.registerDisposer(view.urlInput.dirty.changed.add(this.reRender));
             sourceViews.set(source, view);
           }
