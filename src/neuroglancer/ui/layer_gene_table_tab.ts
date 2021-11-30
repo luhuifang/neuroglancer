@@ -38,6 +38,7 @@ export class GeneTabView extends RefCounted {
         removeChildren(this.listEle)
         removeChildren(this.pagenation)
         removeChildren(this.tbody)
+        this.geneElement.classList.add('gene-table')
         this.geneElement.appendChild(table.tableDom)
         this.totalPage = table.tablePage
         this.geneElement.appendChild(this.genePagenation())
@@ -112,13 +113,13 @@ export class GeneTabView extends RefCounted {
         return TableHead
     }
     private geneFiiter(){
-    const inputEle = document.createElement('input')
-    inputEle.placeholder = 'filter data...'
-    inputEle.addEventListener('change',(event: Event)=>{
-        this.filterparam = (event.target as any).value
-        this.initGeneTable()
-    })
-    return inputEle
+        const inputEle = document.createElement('input')
+        inputEle.placeholder = 'please enter GeneID'
+        inputEle.addEventListener('change',(event: Event)=>{
+            this.filterparam = (event.target as any).value
+            this.initGeneTable()
+        })
+        return inputEle
     }
     async geneTableList():Promise<any>{
         let url = 'http://127.0.0.1:5000/test/annotation/genelist?pagesize=20';
@@ -152,13 +153,15 @@ export class GeneTabView extends RefCounted {
                         tdGene.setAttribute('colspan', '1')
                         gene.innerText = item.gene
                         gene.setAttribute('value', item.gene)
+                        gene.setAttribute('title', item.gene)
                         const tdMIDCount = document.createElement('td')
                         const MIDCount = document.createElement('div')
                         MIDCount.classList.add('cell')
                         tdMIDCount.setAttribute('rowspan', '1')
                         tdMIDCount.setAttribute('colspan', '1')
-                        MIDCount.innerText = item.MIDcount
+                        MIDCount.innerText = that.formatter(item.MIDcount)
                         MIDCount.setAttribute('value', item.gene)
+                        MIDCount.setAttribute('title', that.formatter(item.MIDcount))
                         const tdE10 = document.createElement('td')
                         const E10 = document.createElement('div')
                         E10.classList.add('cell')
@@ -166,6 +169,7 @@ export class GeneTabView extends RefCounted {
                         tdE10.setAttribute('colspan', '1')
                         E10.innerText = item.E10.toFixed(2)
                         E10.setAttribute('value', item.gene)
+                        E10.setAttribute('title', item.E10.toFixed(2))
                         tdCheckbox.appendChild(checkDiv)
                         checkDiv.appendChild(checkbox)
                         tdGene.appendChild(gene)
@@ -232,5 +236,8 @@ export class GeneTabView extends RefCounted {
         this.button.classList.add('el-button','el-button--default','is-plain')
         this.button.innerHTML = `<span>RESET</span>`
         return this.button
+    }
+    formatter(num:any){
+        return String(num).replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g,'$1,');
     }
 }

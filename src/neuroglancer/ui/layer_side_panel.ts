@@ -249,19 +249,19 @@ class LayerSidePanel extends SidePanel {
     this.tabView.element.appendChild(this.makeTabDropZone());
     this.addBody(this.tabView.element);
     this.geneView.tbody.addEventListener('click', (event:Event) =>{
+      console.log(event)
       geneIdClickCount++;
+      // 记录点选geneId前的url路径，为resetButton做准备
       if(geneIdClickCount === 1){
         resetUrl = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText
       }
+      // 清空上一个点选内容
       if(document.getElementsByClassName('success-row')[0]){
         document.getElementsByClassName('success-row')[0].className = ''
       }
+      // 判断是否选中td，是则该行的tr添加success-row类名
       if((event.target as Element).parentElement?.parentElement?.localName === 'tr'){
         (event.target as Element).parentElement?.parentElement?.classList.add('success-row')
-      }
-      if((event.target as Element).localName === 'input'){
-        return
-      }else{
         this.changeGeneId( this.urlInput, (event.target as Element).attributes[1].value)
       }
     })
