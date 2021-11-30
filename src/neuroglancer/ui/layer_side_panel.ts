@@ -33,7 +33,7 @@ import {EventActionMap} from 'neuroglancer/util/mouse_bindings';
 import {CheckboxIcon} from 'neuroglancer/widget/checkbox_icon';
 import {makeDeleteButton} from 'neuroglancer/widget/delete_button';
 import {TabView} from 'neuroglancer/widget/tab_view';
-import {GeneTabView} from 'neuroglancer/ui/layer_gene_table_tab'
+import {geneCloseBtn, GeneTabView} from 'neuroglancer/ui/layer_gene_table_tab'
 import { DataSourceView, SourceUrlAutocomplete } from './layer_data_sources_tab';
 
 const layerNameInputEventMap = EventActionMap.fromObject({
@@ -234,47 +234,50 @@ class LayerSidePanel extends SidePanel {
           },
         },
         this.visibility);
+    // 拿到URLInput实例
     if(this.tabView.stack.sourceTab !==undefined){
       let sourceViews = this.tabView.stack.sourceTab.sourceViews;
       sourceViews.forEach((v) => {
         if(v instanceof DataSourceView){
-          this.urlInput = v.urlInput
+          this.urlInput = v.urlInput;
+          console.log(this.urlInput)
         }
       })
     }
-    this.geneView = new GeneTabView()
+    this.geneView = new GeneTabView();
     this.tabView.element.style.flex = '1';
     this.tabView.element.classList.add('neuroglancer-layer-side-panel-tab-view');
     this.tabView.element.style.position = 'relative';
     this.tabView.element.appendChild(this.makeTabDropZone());
     this.addBody(this.tabView.element);
     this.geneView.tbody.addEventListener('click', (event:Event) =>{
-      console.log(event)
       geneIdClickCount++;
       // 记录点选geneId前的url路径，为resetButton做准备
       if(geneIdClickCount === 1){
-        resetUrl = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText
+        resetUrl = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText;
       }
       // 清空上一个点选内容
       if(document.getElementsByClassName('success-row')[0]){
-        document.getElementsByClassName('success-row')[0].className = ''
+        document.getElementsByClassName('success-row')[0].className = '';
       }
       // 判断是否选中td，是则该行的tr添加success-row类名
       if((event.target as Element).parentElement?.parentElement?.localName === 'tr'){
-        (event.target as Element).parentElement?.parentElement?.classList.add('success-row')
-        this.changeGeneId( this.urlInput, (event.target as Element).attributes[1].value)
+        (event.target as Element).parentElement?.parentElement?.classList.add('success-row');
+        this.changeGeneId( this.urlInput, (event.target as Element).attributes[1].value);
       }
-    })
+    });
+    // geneTable 重置按钮
     this.geneView.button.addEventListener('click',()=>{
       document.getElementsByClassName('success-row')[0].className = ''
       this.changeGeneId( this.urlInput, resetUrl, true);
-    })
-    // console.log((document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText)
+    });
     this.geneView.element.style.flex = '1';
     this.geneView.element.classList.add('neuroglancer-layer-side-panel-tab-view');
     this.geneView.element.style.position = 'relative';
     this.geneView.element.appendChild(this.makeTabDropZone());
+    const closeGeneView = new geneCloseBtn()
     this.addBody(this.geneView.element);
+    this.addBody(closeGeneView.closeIcon)
     // Hide panel automatically if there are no tabs to display (because they have all been moved to
     // another panel).
     this.registerDisposer(panelState.tabsChanged.add(() => {
@@ -287,13 +290,14 @@ class LayerSidePanel extends SidePanel {
     let lastParam:any = ''
     if(!flag){
       let inputValue = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText?.split('/');
-      let num = inputValue.includes('bin')?1:2
-      inputValue.splice(inputValue.indexOf('annotation') + 1, inputValue.length - num - inputValue.indexOf('annotation'), 'gene/'+value)
-      lastParam = inputValue.join('/')
+      // 判断是否包含bin
+      let num = inputValue.includes('bin')?1:2;
+      inputValue.splice(inputValue.indexOf('annotation') + 1, inputValue.length - num - inputValue.indexOf('annotation'), 'gene/'+value);
+      lastParam = inputValue.join('/');
     }else{
-      lastParam = value
+      lastParam = value;
     }
-    urlInput.setValueAndSelection(lastParam)
+    urlInput.setValueAndSelection(lastParam);
     let explicit = true;
     urlInput.disableCompletion();
     urlInput.hideCompletions();

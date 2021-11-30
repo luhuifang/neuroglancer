@@ -5,6 +5,9 @@
     top: 46px;
     background-color: #fff;
     height: calc(100% - 46px);
+    display: block;
+    transition:width 2s;
+    overflow: auto;
 }
 .neuroglancer-annotation-geneTable-tab-new{
     width: 100%;
@@ -17,9 +20,7 @@
     color: #909399;
     font-size: 14px;
     font-weight: bold;
-}
-.neuroglancer-annotation-geneTable-tab .gene-table{
-    overflow-y: scroll;
+    transition: diplay 2s;
 }
 .neuroglancer-annotation-geneTable-tab .el-table{
     border: 1px solid #ebebeb;
@@ -116,7 +117,7 @@
     border-top-color: #c0c4cc;
     bottom: 7px;
 }
-.neuroglancer-annotation-geneTable-tab input{width: 97%;}
+.neuroglancer-annotation-geneTable-tab input{width: 97%;display: block;transition: diplay 2s;}
 .neuroglancer-annotation-geneTable-tab .el-table input{width: auto}
 tr {
     display: table-row;
@@ -124,8 +125,22 @@ tr {
     border-color: inherit;
 }
 
+.geneTableIsClose{
+    left: 15%;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    top: 50px;
+    position: absolute;
+    transition: left 2s;
+}
+.geneTableIsClose .icon{
+    transform: rotate(180deg);
+    transition:transform 2s;
+}
+
 .el-table{width: 100%; border-spacing: 0px;padding: 4px	5px;}
-.el-table tr:hover>td {
+.el-table tr:hover>td { 
     background-color: #e6ebf1;
     cursor: pointer;
 }
@@ -210,12 +225,6 @@ tr {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-/* .el-icon-arrow-left:before {
-    content: "";
-}
-.el-icon-arrow-right:before {
-    content: "";
-} */
 .el-pagination:after, .el-pagination:before {
     display: table;
     content: "";
@@ -232,7 +241,7 @@ tr {
 }
 
 .neuroglancer-annotation-geneTable-tab .el-button {
-    display: inline-block;
+    display: block;
     line-height: 1;
     white-space: nowrap;
     cursor: pointer;
@@ -243,8 +252,6 @@ tr {
     text-align: center;
     box-sizing: border-box;
     outline: none;
-    margin: 0;
-    transition: .1s;
     font-weight: 500;
     -moz-user-select: none;
     -webkit-user-select: none;
@@ -254,6 +261,7 @@ tr {
     border-radius: 4px;
     width: 50%;
     margin: auto auto;
+    transition: display 4s;
 }
 
 .neuroglancer-annotation-geneTable-tab .el-button.is-plain:focus, .el-button.is-plain:hover {
