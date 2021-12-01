@@ -1,11 +1,12 @@
 import { WatchableValueChangeInterface, WatchableValueInterface } from '../trackable_value';
 import { RefCounted } from '../util/disposable';
 import { removeChildren } from '../util/dom';
-import 'neuroglancer/ui/layer_gene_table_tab.css'
 import { TabView } from '../widget/tab_view';
 import { cancellableFetchSpecialOk } from '../util/special_protocol_request';
 import { responseJson } from '../util/http_request';
+import 'neuroglancer/ui/layer_gene_table_tab.css'
 
+let reqUrl: any;
 export class GeneTabView extends RefCounted {
     [x: string]: any;
     element = document.createElement('div');
@@ -25,38 +26,28 @@ export class GeneTabView extends RefCounted {
     tabView: TabView;
     constructor() {
         super();
-        // this.tabs = options.tabs;
         const {element, tabBar} = this;
         element.className = 'neuroglancer-annotation-geneTable-tab';
         tabBar.className = 'neuroglancer-tab-gene-view-bar';
         tabBar.innerHTML = 'Gene Table';
-        // const closeIcon = document.createElement('div'); 
-        // closeIcon.classList.add('geneTableIsClose');
-        // closeIcon.innerHTML = '<svg t="1638237158158" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2941" width="48" height="48"><path d="M937.386667 488.106667L772.266667 372.48c-12.8-9.386667-30.293333-6.826667-40.106667 5.546667-3.84 4.693333-5.546667 10.666667-5.546667 17.066666v233.813334c0 22.613333 25.6 36.693333 45.653334 22.613333l165.546666-115.626667c14.08-14.08 14.08-36.693333-0.426666-47.786666zM914.346667 213.333333h-785.066667c-18.773333 0-34.133333-15.36-34.133333-34.133333s15.36-34.133333 34.133333-34.133333h785.066667c18.773333 0 34.133333 15.36 34.133333 34.133333s-14.933333 34.133333-34.133333 34.133333zM914.346667 878.933333h-785.066667c-18.773333 0-34.133333-15.36-34.133333-34.133333s15.36-34.133333 34.133333-34.133333h785.066667c18.773333 0 34.133333 15.36 34.133333 34.133333s-14.933333 34.133333-34.133333 34.133333zM624.213333 435.2h-494.933333c-18.773333 0-34.133333-15.36-34.133333-34.133333s15.36-34.133333 34.133333-34.133334h494.933333c18.773333 0 34.133333 15.36 34.133334 34.133334s-14.933333 34.133333-34.133334 34.133333zM624.64 657.066667H129.28c-18.773333 0-34.133333-15.36-34.133333-34.133334s15.36-34.133333 34.133333-34.133333h495.36c18.773333 0 34.133333 15.36 34.133333 34.133333v0.426667c-0.426667 18.346667-15.36 33.706667-34.133333 33.706667z" fill="#ffffff" p-id="2942"></path></svg>'
-        // closeIcon.addEventListener('click', ()=>{
-        //     this.isCloseFlag = !this.isCloseFlag
-        //     element.style.width = this.isCloseFlag?'0':'15%';
-        //     this.button.style.display = this.isCloseFlag?'none':'block';
-        //     tabBar.style.display = this.isCloseFlag?'none':'block';
-        //     (document.getElementsByClassName('geneTable-head')[0] as HTMLElement).style.display = this.isCloseFlag?'none':'flex';
-        //     (closeIcon.getElementsByClassName('icon')[0] as HTMLElement).style.transform = this.isCloseFlag ? 'rotate(0deg)':'rotate(180deg)';
-        //     (element.getElementsByClassName('input')[0] as HTMLElement).style.display = this.isCloseFlag?'none':'block';
-        // })
         element.appendChild(tabBar);
-        // element.appendChild(closeIcon);
         this.element.appendChild(this.geneTableHead());
         this.element.appendChild(this.geneFiiter());
-        this.initGeneTable();
+        // this.initGeneTable(reqUrl);
     }
-    private async initGeneTable(){
+    async initGeneTable(value: string){
+        reqUrl = value
         removeChildren(this.listEle);
         removeChildren(this.pagenation);
         removeChildren(this.tbody);
         this.geneElement.classList.add('gene-table');
-        this.geneElement.appendChild( await this.geneTableList1());
-        this.geneElement.appendChild(this.genePagenation());
+        this.geneElement.appendChild( await this.geneTableList());
         this.element.appendChild(this.geneElement);
-        this.element.appendChild(this.geneTableReset());
+        if(this.totalPage){
+            this.geneElement.appendChild(this.genePagenation());
+            this.element.appendChild(this.geneTableReset());
+        }
+        console.log(this.element)
     }
     private geneTableHead(){
         const TableHead = document.createElement('div')
@@ -120,7 +111,7 @@ export class GeneTabView extends RefCounted {
             }
             this.sortname = dataFlag === 'true' ?'' :(event.target as Element).classList[2]
             this.isasc = (event.target as Element).classList[1] == 'ascending'
-            this.initGeneTable()
+            this.initGeneTable(reqUrl)
             })
         }
         return TableHead
@@ -130,15 +121,15 @@ export class GeneTabView extends RefCounted {
         inputEle.placeholder = 'please enter GeneID';
         inputEle.addEventListener('change',(event: Event)=>{
             this.filterparam = (event.target as any).value;
-            this.initGeneTable();
+            this.initGeneTable(reqUrl);
         })
         return inputEle
     }
-    async geneTableList1(){
+    async geneTableList(){
         this.listEle.classList.add('el-table')
         this.listEle.appendChild(this.tbody)
-        const res = await this.getGeneTabledata('');
-        if(res.code === 200){
+        const res = await this.getGeneTabledata();
+        if(res?.code === 200){
             this.totalPage = res.totalpage
             res.data.forEach((item:any)=>{
                 const tr = document.createElement('tr')
@@ -185,6 +176,8 @@ export class GeneTabView extends RefCounted {
                 this.tbody.appendChild(tr)
                 this.listEle.appendChild(this.tbody)
             })
+        }else{
+            this.listEle.innerHTML = `<div class="nodata">暂无数据</div>`
         }
         return this.listEle
     }
@@ -214,22 +207,26 @@ export class GeneTabView extends RefCounted {
         pageDiv.appendChild(pageTotal);
         prevBtn.addEventListener('click',()=>{
             if(this.pagenum > 1){
-            this.pagenum = this.pagenum - 1;
-            pageCurr.setAttribute('value', this.pagenum.toString());
-            this.initGeneTable();
+                this.pagenum = this.pagenum - 1;
+                pageCurr.setAttribute('value', this.pagenum.toString());
+                this.initGeneTable(reqUrl);
             }else{
-            window.confirm('已经是第一页了!');
+                window.confirm('已经是第一页了!');
             }
         })
         nextBtn.addEventListener('click',()=>{
-            this.pagenum = this.pagenum + 1;
-            pageCurr.setAttribute('value', this.pagenum.toString());
-            this.initGeneTable();
+            if(this.pagenum < this.totalPage){
+                this.pagenum = this.pagenum + 1;
+                pageCurr.setAttribute('value', this.pagenum.toString());
+                this.initGeneTable(reqUrl);
+            }else{
+                window.confirm('已经是最后一页了!');
+            }
         });
         pageCurr.addEventListener('change',(event:Event)=>{
             console.log(event);
             this.pagenum = (event.target as HTMLInputElement ).value;
-            this.initGeneTable();
+            this.initGeneTable(reqUrl);
         })
         return this.pagenation
     }
@@ -241,15 +238,24 @@ export class GeneTabView extends RefCounted {
     formatter(num:any){
         return String(num).replace(/(\d{1,3})(?=(\d{3})+(?:$|\.))/g,'$1,');
     }
-    getGeneTabledata(requrl:string = ''): Promise<any> {
-       let url = requrl ? requrl:'http://127.0.0.1:5000/test/annotation/genelist?pagesize=20';
-       url = url + '&pagenum=' + this.pagenum;
-       url = this.filterparam?url + '&filterparam=' + this.filterparam : url;
-       url = this.sortname?url + '&sort={"name":"' + this.sortname + '","isAsc":' + this.isasc+'}' : url;
-       let res = async () => {
-           return await cancellableFetchSpecialOk(undefined, `${url}`, {}, responseJson);
-       };
-       return res()
+    getGeneTabledata(): Promise<any> {
+        let host:any
+        let url:any;
+        if(reqUrl){
+            host = reqUrl.split('/')
+            url = host[2] + '//' + host[4] + '/' + host[5] +'/annotation/genelist';
+            console.log(reqUrl)
+            url = url + '?pagesize=' + 20;
+            url = url + '&pagenum=' + this.pagenum;
+            url = this.filterparam?url + '&filterparam=' + this.filterparam : url;
+            url = this.sortname?url + '&sort={"name":"' + this.sortname + '","isAsc":' + this.isasc+'}' : url;
+            let res = async () => {
+                return await cancellableFetchSpecialOk(undefined, `${url}`, {}, responseJson);
+            };
+            return res()
+        }else{
+            return reqUrl
+        }
     }
 }
 let isCloseFlag = false

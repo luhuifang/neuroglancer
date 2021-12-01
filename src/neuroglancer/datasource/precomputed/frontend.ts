@@ -493,7 +493,6 @@ async function getSkeletonSource(
 function getJsonMetadata(
     chunkManager: ChunkManager, credentialsProvider: SpecialProtocolCredentialsProvider,
     url: string): Promise<any> {
-      console.log(credentialsProvider)
   return chunkManager.memoize.getUncounted(
       {'type': 'precomputed:metadata', url, credentialsProvider: getObjectId(credentialsProvider)},
       async () => {

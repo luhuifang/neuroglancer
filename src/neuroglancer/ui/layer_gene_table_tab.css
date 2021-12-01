@@ -117,7 +117,7 @@
     border-top-color: #c0c4cc;
     bottom: 7px;
 }
-.neuroglancer-annotation-geneTable-tab input{width: 97%;display: block;transition: diplay 2s;}
+.neuroglancer-annotation-geneTable-tab input{width: 97%;display: block;transition: diplay 2s;text-align: center;}
 .neuroglancer-annotation-geneTable-tab .el-table input{width: auto}
 tr {
     display: table-row;
@@ -139,7 +139,7 @@ tr {
     transition:transform 2s;
 }
 
-.el-table{width: 100%; border-spacing: 0px;padding: 4px	5px;}
+.el-table{width: 100%; border-spacing: 0px}
 .el-table tr:hover>td { 
     background-color: #e6ebf1;
     cursor: pointer;
@@ -268,4 +268,12 @@ tr {
     background: #fff;
     border-color: #409eff;
     color: #409eff;
+}
+
+.el-table .nodata{
+    color: #000;
+    text-align: center;
+    padding: 25px;
+    font-size: 1.3em;
+    font-weight: bold;
 }

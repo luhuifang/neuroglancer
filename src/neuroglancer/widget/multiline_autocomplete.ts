@@ -83,7 +83,6 @@ export type Completer = (value: string, cancellationToken: CancellationToken) =>
     Promise<CompletionResult>|null;
 
 const DEFAULT_COMPLETION_DELAY = 200;  // milliseconds
-
 export class AutocompleteTextInput extends RefCounted {   
   element = document.createElement('div');
   inputElement = document.createElement('span');
@@ -200,7 +199,6 @@ export class AutocompleteTextInput extends RefCounted {
     super();
     this.completer = options.completer;
     const {delay = DEFAULT_COMPLETION_DELAY} = options;
-    console.log(options)
     let debouncedCompleter = this.scheduleUpdateCompletions = debounce(() => {
       const cancellationToken = this.activeCompletionCancellationToken =
           new CancellationTokenSource();
@@ -363,6 +361,7 @@ export class AutocompleteTextInput extends RefCounted {
         this.disableCompletion();
         this.hideCompletions();
         this.onCommit.dispatch(this.value, explicit);
+        // geneTable.initGeneTable(this.value);
       }
     });
     registerActionListener(inputElement, 'cancel', (event: CustomEvent) => {

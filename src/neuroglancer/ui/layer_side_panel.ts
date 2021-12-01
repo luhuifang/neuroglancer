@@ -234,17 +234,22 @@ class LayerSidePanel extends SidePanel {
           },
         },
         this.visibility);
+      this.geneView = new GeneTabView();
     // 拿到URLInput实例
     if(this.tabView.stack.sourceTab !==undefined){
       let sourceViews = this.tabView.stack.sourceTab.sourceViews;
       sourceViews.forEach((v) => {
         if(v instanceof DataSourceView){
           this.urlInput = v.urlInput;
-          console.log(this.urlInput)
+          if((this.urlInput.inputElement as HTMLInputElement)?.innerText){
+            this.geneView.initGeneTable((this.urlInput.inputElement as HTMLInputElement)?.innerText)
+          }
+          registerActionListener(this.urlInput.inputElement, 'commit', (event: CustomEvent) => {
+            this.geneView.initGeneTable((event.target as HTMLElement).innerText)
+          });
         }
       })
     }
-    this.geneView = new GeneTabView();
     this.tabView.element.style.flex = '1';
     this.tabView.element.classList.add('neuroglancer-layer-side-panel-tab-view');
     this.tabView.element.style.position = 'relative';
@@ -263,7 +268,7 @@ class LayerSidePanel extends SidePanel {
       // 判断是否选中td，是则该行的tr添加success-row类名
       if((event.target as Element).parentElement?.parentElement?.localName === 'tr'){
         (event.target as Element).parentElement?.parentElement?.classList.add('success-row');
-        this.changeGeneId( this.urlInput, (event.target as Element).attributes[1].value);
+        this.changeGeneId( this.urlInput, (event.target as Element).attributes[1].value, false);
       }
     });
     // geneTable 重置按钮

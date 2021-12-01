@@ -129,6 +129,16 @@ export function parseUrl(url: string): {protocol: string, host: string, path: st
   return {protocol: match[1], host: match[2], path: match[3]};
 }
 
+export function parseStereoUrl(url:string): {protocol: string, host: string, path: string, sn:string, imgType:string, expType:string} {
+  let u = parseUrl(url)
+  const urlDNBPattern = /^\/([^\/]+)\/([^\/]+)\/([^\/]+)\/.*/;
+  let match = u['path'].match(urlDNBPattern);
+  if (match === null) {
+    return {protocol: u['protocol'], host: u['host'], path: u['path'], sn:'', imgType:'', expType:''}
+  }
+  return {protocol: u['protocol'], host: u['host'], path: u['path'], sn: match[1], imgType: match[2], expType: match[3]};
+}
+
 export function isNotFoundError(e: any) {
   if (!(e instanceof HttpError)) return false;
   // Treat CORS errors (0) or 403 as not found.  S3 returns 403 if the file does not exist because

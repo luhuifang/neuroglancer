@@ -77,6 +77,7 @@ export class StateEditorDialog extends Overlay {
 
   private applyChanges() {
     if (this.parsedValue !== null) {
+      console.log(this.parsedValue)
       this.viewer.state.reset();
       this.viewer.state.restoreState(this.parsedValue);
     }
