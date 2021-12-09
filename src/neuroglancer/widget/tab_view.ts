@@ -39,7 +39,6 @@ export class Tab extends RefCounted {
   constructor(
       public visibility = new WatchableVisibilityPriority(WatchableVisibilityPriority.VISIBLE)) {
     super();
-    console.log(visibility)
     const {element} = this;
     element.classList.add('neuroglancer-tab-content');
   }

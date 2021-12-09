@@ -54,15 +54,15 @@ const PROJECTION_RENDER_SCALE_JSON_KEY = 'projectionAnnotationSpacing';
 const SHADER_JSON_KEY = 'shader';
 const SHADER_CONTROLS_JSON_KEY = 'shaderControls';
 let colorArr = [
-  {colorName: 'DEFAULT', colorText: 'DEFAULT', colorBg: {left: '#000091', right: '#ff1d00'}, colorFloat: [0.001, 0.001, 0.54, 0.999, 0.11, 0.001], reversed: false, clicked: true},
-  {colorName: 'Viridis', colorText: 'Viridis', colorBg: {left: '#440154', right: '#fde725'}, colorFloat: [0.26, 0.003, 0.33, 0.99, 0.9, 0.14], reversed: false, clicked: false},
-  {colorName: 'Cividis', colorText: 'Cividis', colorBg: {left: '#00224e', right: '#fee838'}, colorFloat: [0.001, 0.13, 0.3, 0.996, 0.9, 0.21], reversed: false, clicked: false},
-  {colorName: 'Inferno', colorText: 'Inferno', colorBg: {left: '#000004', right: '#fcffa4'}, colorFloat: [0.001, 0.001, 0.01, 0.98, 0.999, 0.64], reversed: false, clicked: false},
-  {colorName: 'Plasma', colorText: 'Plasma', colorBg: {left: '#0d0887', right: '#f0f921'}, colorFloat: [0.05, 0.03, 0.52, 0.94, 0.97, 0.12], reversed: false, clicked: false},
-  {colorName: 'Purples', colorText: 'Purples', colorBg: {left: '#fcfbfd', right: '#3f007d'}, colorFloat: [0.99, 0.98, 0.98, 0.25, 0.001, 0.49], reversed: false, clicked: false},
-  {colorName: 'Blues', colorText: 'Blues', colorBg: {left: '#f7fbff', right: '#08306b'}, colorFloat: [0.96,0.98, 0.98, 0.03, 0.19, 0.42], reversed: false, clicked: false},
-  {colorName: 'Greens', colorText: 'Greens', colorBg: {left: '#f7fcf5', right: '#00441b'}, colorFloat: [0.96, 0.99, 0.96, 0.001, 0.27, 0.10], reversed: false, clicked: false},
-  {colorName: 'Oranges', colorText: 'Oranges', colorBg: {left: '#fff5eb', right: '#7f2704'}, colorFloat: [0.999, 0.96, 0.92, 0.5, 0.15, 0.1], reversed: false, clicked: false}
+  {colorName: 'DEFAULT', colorText: 'DEFAULT', colorArr:['#000091','#7cff7c', '#ffff52','#7f0000'],colorBg: {left: '#000091', right: '#ff1d00'}, colorFloat: [0.001, 0.001, 0.54, 0.999, 0.11, 0.001], reversed: false, clicked: true},
+  {colorName: 'Viridis', colorText: 'Viridis', colorArr:['#440154','#fde725'],colorBg: {left: '#440154', right: '#fde725'}, colorFloat: [0.26, 0.003, 0.33, 0.99, 0.9, 0.14], reversed: false, clicked: false},
+  {colorName: 'Cividis', colorText: 'Cividis', colorArr:['#00224e','#fee838'],colorBg: {left: '#00224e', right: '#fee838'}, colorFloat: [0.001, 0.13, 0.3, 0.996, 0.9, 0.21], reversed: false, clicked: false},
+  {colorName: 'Inferno', colorText: 'Inferno', colorArr:['#000004','#fcffa4'],colorBg: {left: '#000004', right: '#fcffa4'}, colorFloat: [0.001, 0.001, 0.01, 0.98, 0.999, 0.64], reversed: false, clicked: false},
+  {colorName: 'Plasma', colorText: 'Plasma', colorArr:['#0d0887','#f0f921'],colorBg: {left: '#0d0887', right: '#f0f921'}, colorFloat: [0.05, 0.03, 0.52, 0.94, 0.97, 0.12], reversed: false, clicked: false},
+  {colorName: 'Purples', colorText: 'Purples', colorArr:['#fcfbfd','#3f007d'],colorBg: {left: '#fcfbfd', right: '#3f007d'}, colorFloat: [0.99, 0.98, 0.98, 0.25, 0.001, 0.49], reversed: false, clicked: false},
+  {colorName: 'Blues', colorText: 'Blues', colorArr:['#f7fbff','#08306b'],colorBg: {left: '#f7fbff', right: '#08306b'}, colorFloat: [0.96,0.98, 0.98, 0.03, 0.19, 0.42], reversed: false, clicked: false},
+  {colorName: 'Greens', colorText: 'Greens', colorArr:['#f7fcf5','#00441b'],colorBg: {left: '#f7fcf5', right: '#00441b'}, colorFloat: [0.96, 0.99, 0.96, 0.001, 0.27, 0.10], reversed: false, clicked: false},
+  {colorName: 'Oranges', colorText: 'Oranges', colorArr:['#fff5eb','#7f2704'],colorBg: {left: '#fff5eb', right: '#7f2704'}, colorFloat: [0.999, 0.96, 0.92, 0.5, 0.15, 0.1], reversed: false, clicked: false}
 ]
 
 function addPointAnnotations(annotations: LocalAnnotationSource, obj: any) {
@@ -578,6 +578,7 @@ class ShaderCodeOverlay extends Overlay {
   }
 }
 
+// 颜色取反
 class colorReversed extends Tab {
   colorBarReversed = this.registerDisposer(new colorBarView(this.layer))
   colorReversedElement = document.createElement('div')
@@ -612,17 +613,16 @@ class colorReversed extends Tab {
     colorArr.forEach((item, index) =>{
       item.reversed = flag
       if(item.clicked){
-        console.log(item)
         this.colorBarReversed.changeEdit( item, index,)
       }
     })
   }
 }
 
-
+// colorBar  View
 class colorBarView extends Tab {
   codeWidget = this.registerDisposer(makeShaderCodeWidget(this.layer));
-  colorDiv = document.createElement('div')
+  colorDiv = document.createElement('div');
   constructor(public layer: AnnotationUserLayer){
     super();
     this.colorDiv.id = 'colorBarHq'
@@ -634,16 +634,18 @@ class colorBarView extends Tab {
       this.colorDiv.appendChild(element)
       element.appendChild(elementText);
       element.appendChild(elementColor);
-      elementColor.style.backgroundImage = 'linear-gradient(to right, ' + colorArr[i].colorBg.left + ' ,' + colorArr[i].colorBg.right + ')';
+      elementColor.style.backgroundImage = 'linear-gradient(to right, ' + [...colorArr[i].colorArr] + ')';
       elementColor.addEventListener('click', ()=>{
         this.changeEdit(colorArr[i], i)
       })
     }
   }
   changeEdit(arr: any, number: any){
+    console.log(arr, number)
     colorArr.forEach((item, index) =>{
       item.clicked = index == number ? true : false
-    })
+    });
+    // 非默认颜色
     if(number){
       let clickColorArr = arr.reversed?[arr.colorFloat[3], arr.colorFloat[4], arr.colorFloat[5], arr.colorFloat[0], arr.colorFloat[1], arr.colorFloat[2]] : [arr.colorFloat[0], arr.colorFloat[1], arr.colorFloat[2], arr.colorFloat[3], arr.colorFloat[4], arr.colorFloat[5]];
       this.codeWidget.textEditor.setValue(
@@ -654,8 +656,9 @@ class colorBarView extends Tab {
           setPointMarkerFactor(sizeFactor);
           setPointMarkerOpacityFactor(oFactor);
         }`
-      );
+        );
     }else{
+      // 
       if(!arr.reversed){
         this.codeWidget.textEditor.setValue(
           `#uicontrol float sizeFactor slider(min=0.0, max=2.0, default=1.0, step=0.01); 
@@ -678,8 +681,9 @@ class colorBarView extends Tab {
         );
       }
     }
+    let dir = arr.reversed ?'bottom, ' : 'top, ';
+    (document.getElementsByClassName('colorBarScale')[0] as HTMLElement).style.backgroundImage = 'linear-gradient(to '+ dir + [...arr.colorArr] + ')';
     this.codeWidget.setValidState(undefined);
-    // this.codeWidget.debouncedValueUpdater();
   }
 }
 
@@ -696,6 +700,7 @@ class RenderingOptionsTab extends Tab {
             .registerDisposer(new DependentViewWidget(
                 layer.annotationProperties,
                 (properties, parent) => {
+                  console.log(layer.annotationProperties)
                   if (properties === undefined || properties.length === 0) return;
                   const propertyList = document.createElement('div');
                   parent.appendChild(propertyList);

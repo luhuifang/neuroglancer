@@ -130,3 +130,61 @@ background-color: rgb(255, 73, 73);
   height: 16px;
   background-color: #fff;
 }
+
+.colorBarScale {
+  list-style: none;
+  padding: 0 0 10px 0;
+  background-image: linear-gradient(to top, #000091,#7cff7c, #ffff52,#7f0000);
+  width: 25px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  display: none;
+  z-index: 99;
+  left: 77%;
+  position: fixed;
+  top: 80%;
+}
+
+.colorBarScale>.colorBarScaleli {
+  width: 15px;
+  height: 20px;
+  position: relative;
+  margin-left: 10px;
+  display: block;
+}
+.colorBarScale li:first-child> a{
+  margin-top: -8px;
+}
+.colorBarScale li:last-child{
+  top: 70px;
+}
+
+.colorBarScale li:last-child::before{
+  bottom: -2px;
+  top: 18px;
+}
+
+.colorBarScale>.colorBarScaleli:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0px;
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+}
+
+.colorBarScale>.colorBarScaleli+.colorBarScaleli {
+  border-left-color: gray;
+}
+
+.colorBarScale>.colorBarScaleli>a {
+  display: block;
+  position: absolute;
+  height: 20px;
+  line-height: 20px;
+  margin-left: 25px;
+  /* margin-top: 10px; */
+  color: #79d0f3;
+}

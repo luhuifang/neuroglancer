@@ -351,6 +351,7 @@ export class MultiscaleAnnotationSource extends SharedObject implements
   segmentFilteredSources: Owned<AnnotationSubsetGeometryChunkSource>[];
   spatiallyIndexedSources = new Set<Borrowed<AnnotationGeometryChunkSource>>();
   rank: number;
+  metadata: any;
   readonly relationships: readonly string[];
   readonly properties: Readonly<AnnotationPropertySpec>[];
   readonly annotationPropertySerializer: AnnotationPropertySerializer;

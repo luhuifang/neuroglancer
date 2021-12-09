@@ -188,6 +188,9 @@ function registerRelatedLayouts(
     button.title = `Switch to ${relatedLayout} layout.`;
     button.addEventListener('click', () => {
       layout.container.name = relatedLayout;
+      if(layout.container.name === 'xy'){
+        (document.getElementsByClassName('colorBarScale')[0] as HTMLElement).style.display = 'block';
+      }
     });
     controls.appendChild(button);
   }

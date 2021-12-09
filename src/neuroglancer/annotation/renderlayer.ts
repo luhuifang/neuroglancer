@@ -537,7 +537,7 @@ function AnnotationRenderLayer<TBase extends AnyConstructor<VisibilityTrackedRen
       }
     }
 
-    transformPickedValue(pickState: PickState) {
+    transformPickedBaseValue(pickState: PickState, index:number) {
       const {pickedAnnotationBuffer} = pickState;
       if (pickedAnnotationBuffer === undefined) return undefined;
       const {properties} = this.base.source;
@@ -551,7 +551,14 @@ function AnnotationRenderLayer<TBase extends AnyConstructor<VisibilityTrackedRen
       annotationPropertySerializer.deserialize(
           new DataView(pickedAnnotationBuffer), pickedAnnotationBufferOffset! + baseNumBytes,
           /*isLittleEndian=*/ Endianness.LITTLE === ENDIANNESS, propertyValues);
-      return formatAnnotationPropertyValue(properties[0], propertyValues[0]);
+      return formatAnnotationPropertyValue(properties[index], propertyValues[index]);
+    }
+
+    transformPickedValue(pickState: PickState) {
+      return this.transformPickedBaseValue(pickState, 0);
+    }
+    transformPickedValueGeneCount(pickState: PickState) {
+      return this.transformPickedBaseValue(pickState, 1);
     }
 
     isReady() {

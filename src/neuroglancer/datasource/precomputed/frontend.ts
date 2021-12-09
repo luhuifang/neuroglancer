@@ -620,7 +620,7 @@ class AnnotationMetadata {
   parameters: AnnotationSourceParameters;
   spatialIndices: AnnotationSpatialIndexLevelMetadata[];
   binlist : string[];
-  genelist: string[];
+  maxValue: string|number;
   constructor(public url: string, metadata: any) {
     verifyObject(metadata);
     const baseCoordinateSpace =
@@ -693,7 +693,7 @@ class AnnotationMetadata {
         }));
     this.spatialIndices.reverse();
     this.binlist = metadata.binlist;
-    this.genelist = metadata.genelist;
+    this.maxValue = metadata.maxValue;
   }
 }
 

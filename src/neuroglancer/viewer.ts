@@ -782,6 +782,7 @@ export class Viewer extends RefCounted implements ViewerState {
   }
 
   editJsonState() {
+    console.log('lala')
     new StateEditorDialog(this);
   }
 

@@ -348,6 +348,7 @@ export function formatNumericProperty(property: AnnotationNumericPropertySpec, v
 }
 
 export function formatAnnotationPropertyValue(property: AnnotationPropertySpec, value: any): string {
+  if(property.identifier === 'color'){return '1'}
   switch (property.type) {
     case 'rgb':
       return serializeColor(unpackRGB(value));

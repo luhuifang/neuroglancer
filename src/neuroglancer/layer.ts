@@ -72,7 +72,8 @@ export interface UserLayerSelectionState {
   annotationSourceIndex: number|undefined;
   annotationSubsource: string|undefined;
   annotationPartIndex: number|undefined;
-
+  geneId: number | string | undefined;
+  MIDcount: number | string | undefined;
   value: any;
 }
 
@@ -121,12 +122,16 @@ export class UserLayer extends RefCounted {
     state.annotationSubsource = undefined;
     state.annotationPartIndex = undefined;
     state.value = undefined;
+    state.geneId = undefined;
+    state.MIDcount = undefined;
   }
 
   resetSelectionState(state: this['selectionState']) {
     state.localPositionValid = false;
     state.annotationId = undefined;
     state.value = undefined;
+    state.geneId = undefined;
+    state.MIDcount = undefined;
   }
 
   selectionStateFromJson(state: this['selectionState'], json: any) {
@@ -152,8 +157,11 @@ export class UserLayer extends RefCounted {
       state.annotationPartIndex = verifyOptionalObjectProperty(json, 'annotationPart', verifyInt);
       state.annotationSubsource =
           verifyOptionalObjectProperty(json, 'annotationSubsource', verifyString);
+      state.geneId =
+      verifyOptionalObjectProperty(json, 'prop_mid', verifyString);
+      state.MIDcount =
+      verifyOptionalObjectProperty(json, 'prop_genecount', verifyString);
     }
-
     state.value = json.value;
   }
 
@@ -180,6 +188,8 @@ export class UserLayer extends RefCounted {
       json.annotationPart = state.annotationPartIndex;
       json.annotationSource = state.annotationSourceIndex;
       json.annotationSubsource = state.annotationSubsource;
+      json.geneId = state.geneId;
+      json.MIDcount = state.MIDcount;
     }
     if (state.value != null) {
       json.value = state.value;
@@ -198,6 +208,7 @@ export class UserLayer extends RefCounted {
     }
     state.localPositionValid = true;
     state.value = this.getValueAt(mouseState.position, mouseState);
+    state.geneId = this.getValueAtGeneCount(mouseState.position, mouseState);
   }
 
   copySelectionState(dest: this['selectionState'], source: this['selectionState']) {
@@ -419,7 +430,27 @@ export class UserLayer extends RefCounted {
     let {renderLayers} = this;
     let {pickedRenderLayer} = pickState;
     if (pickedRenderLayer !== null && renderLayers.indexOf(pickedRenderLayer) !== -1) {
+      // result  =>  string : '44'
       result = pickedRenderLayer.transformPickedValue(pickState);
+      result = this.transformPickedValue(result);
+      if (result != null) return result;
+    }
+    for (let layer of renderLayers) {
+      result = layer.getValueAt(position);
+      if (result != null) {
+        break;
+      }
+    }
+    return this.transformPickedValue(result);
+  }
+
+  getValueAtGeneCount(position: Float32Array, pickState: PickState) {
+    let result: any;
+    let {renderLayers} = this;
+    let {pickedRenderLayer} = pickState;
+    if (pickedRenderLayer !== null && renderLayers.indexOf(pickedRenderLayer) !== -1) {
+      // result  =>  string : '44'
+      result = pickedRenderLayer.transformPickedValueGeneCount(pickState);
       result = this.transformPickedValue(result);
       if (result != null) return result;
     }
@@ -981,6 +1012,7 @@ export class LayerSelectedValues extends RefCounted {
     }
   }
 
+  // 返回selectionState
   get<T extends UserLayer>(userLayer: T): T['selectionState']|undefined {
     this.update();
     const {selectionState} = userLayer;
