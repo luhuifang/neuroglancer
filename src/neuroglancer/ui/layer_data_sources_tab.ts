@@ -38,6 +38,7 @@ import {makeAddButton} from 'neuroglancer/widget/add_button';
 import {CoordinateSpaceTransformWidget} from 'neuroglancer/widget/coordinate_transform';
 import {AutocompleteTextInput, makeCompletionElementWithDescription} from 'neuroglancer/widget/multiline_autocomplete';
 import {Tab} from 'neuroglancer/widget/tab_view';
+import { makeElement } from './layer_gene_table_tab';
 
 export class SourceUrlAutocomplete extends AutocompleteTextInput {
   dataSourceView: DataSourceView;
@@ -235,6 +236,24 @@ export class LoadedDataSourceView extends RefCounted {
   }
 }
 
+function colorBarScale(value: string){
+  // const ul:Node = makeElement('ul', ['colorBarScale']);
+  const ul = document.createElement('ul');
+  ul.classList.add('colorBarScale')
+  let max = value > '1000'? value.toString().substr(0, value.length - 3): value; 
+  for(let i = 2; i >0; i--){
+    const li = makeElement('li', ['colorBarScaleli'], {});
+    const a = makeElement('a',[],{'href': 'javascript:void()'}, ( i == 1 ? (0 + '') : value ));
+    console.log(a)
+    li.appendChild(a);
+    ul.appendChild(li);
+  }  
+  console.log(document.getElementsByClassName('colorBarScale'))
+  if(document.getElementsByClassName('colorBarScale')[0]){ let dom = document.getElementsByClassName('colorBarScale')[0]; dom.remove()}
+  document.body.appendChild(ul)
+  // return ul
+}
+
 export class SelectBinView extends RefCounted{
   selectElement = document.createElement('select');
   inputValue = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText.split('/');
@@ -252,11 +271,12 @@ export class SelectBinView extends RefCounted{
         this.selectElement.options.add(new Option(binList[i], binList[i],false, binList[i] === this.lastParam[0]?true:false) );
       }
     }
+    colorBarScale(source.dataSource.subsources[0].subsource.annotation?.metadata?.maxValue);
+    (document.getElementsByClassName('colorBarScale')[0] as HTMLElement).style.display = 'block';
   }
 
   onchange = (urlInput: SourceUrlAutocomplete, flag: Boolean = true) => {
     let objS = (document.getElementsByClassName("neuroglancer-layer-side-panel-type-hq")[0] as HTMLInputElement).value;
-    console.log(urlInput)
     this.lastParam = this.inputValue.join('/')+'/'+objS;
     if(flag){
       urlInput.setValueAndSelection(this.lastParam);

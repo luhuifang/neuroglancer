@@ -44,6 +44,7 @@ export function allRenderLayerRoles() {
 }
 
 export class RenderLayer extends RefCounted {
+  [x: string]: any;
   userLayer: UserLayer|undefined;
   role: RenderLayerRole = RenderLayerRole.DATA;
   messages = new MessageList();

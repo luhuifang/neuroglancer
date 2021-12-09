@@ -8,7 +8,7 @@ import 'neuroglancer/ui/layer_gene_table_tab.css'
 
 let reqUrl: any;
 // 创建一个element
-const makeElement = (
+export const makeElement = (
     tag: string,
     classes?: string[],
     attrs?: Record<string, any>,
@@ -70,6 +70,7 @@ export class GeneTabView extends RefCounted {
     pagenation = document.createElement('div');
     totalPage:any;
     tabView: TabView;
+    closeBtn = new geneCloseBtn();
     constructor() {
         super();
         const {element, tabBar} = this;
@@ -79,6 +80,7 @@ export class GeneTabView extends RefCounted {
         element.appendChild(tabBar);
         this.element.appendChild(this.geneTableHead());
         this.element.appendChild(this.geneFiiter());
+        this.element.appendChild(this.closeBtn.closeIcon);
     }
     async initGeneTable(value: string){
         reqUrl = value
@@ -91,7 +93,7 @@ export class GeneTabView extends RefCounted {
         if(this.totalPage){
             this.geneElement.appendChild(this.genePagenation());
             this.element.appendChild(this.geneTableReset());
-        }
+        };
     }
     private geneTableHead(){
         const TableHead = makeElement('div', ['geneTable-head'])
@@ -239,27 +241,43 @@ export class GeneTabView extends RefCounted {
             url = url + '&pagenum=' + this.pagenum;
             url = this.filterparam?url + '&filterparam=' + this.filterparam : url;
             url = this.sortname?url + '&sort={"name":"' + this.sortname + '","isAsc":' + this.isasc+'}' : url;
-            let res = async () => {
-                return await cancellableFetchSpecialOk(undefined, `${url}`, {}, responseJson);
-            };
-            return res()
+            return cancellableFetchSpecialOk(undefined, `${url}`, {}, responseJson);
         }else{
             return reqUrl
         }
+    }
+    getData(){
+
     }
 }
 let isCloseFlag = false
 export class geneCloseBtn extends RefCounted {
     closeIcon = document.createElement('div'); 
+    closeSpan = document.createElement('p')
     constructor(){
         super();
         this.closeIcon.classList.add('geneTableIsClose');
-        this.closeIcon.innerHTML = '<svg t="1638237158158" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2941" width="48" height="48"><path d="M937.386667 488.106667L772.266667 372.48c-12.8-9.386667-30.293333-6.826667-40.106667 5.546667-3.84 4.693333-5.546667 10.666667-5.546667 17.066666v233.813334c0 22.613333 25.6 36.693333 45.653334 22.613333l165.546666-115.626667c14.08-14.08 14.08-36.693333-0.426666-47.786666zM914.346667 213.333333h-785.066667c-18.773333 0-34.133333-15.36-34.133333-34.133333s15.36-34.133333 34.133333-34.133333h785.066667c18.773333 0 34.133333 15.36 34.133333 34.133333s-14.933333 34.133333-34.133333 34.133333zM914.346667 878.933333h-785.066667c-18.773333 0-34.133333-15.36-34.133333-34.133333s15.36-34.133333 34.133333-34.133333h785.066667c18.773333 0 34.133333 15.36 34.133333 34.133333s-14.933333 34.133333-34.133333 34.133333zM624.213333 435.2h-494.933333c-18.773333 0-34.133333-15.36-34.133333-34.133333s15.36-34.133333 34.133333-34.133334h494.933333c18.773333 0 34.133333 15.36 34.133334 34.133334s-14.933333 34.133333-34.133334 34.133333zM624.64 657.066667H129.28c-18.773333 0-34.133333-15.36-34.133333-34.133334s15.36-34.133333 34.133333-34.133333h495.36c18.773333 0 34.133333 15.36 34.133333 34.133333v0.426667c-0.426667 18.346667-15.36 33.706667-34.133333 33.706667z" fill="#ffffff" p-id="2942"></path></svg>'
+        this.closeIcon.innerHTML = '<svg t="1638952305823" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2310" width="20" height="20"><path d="M849 509.3L456.27 904.74a32 32 0 0 0 45.41 45.1L917 531.7a32 32 0 0 0-0.16-45.25L501.53 74a32 32 0 1 0-45.1 45.41z" p-id="2311"></path><path d="M499.78 509.3L107.05 904.74a32 32 0 0 0 45.41 45.1L567.74 531.7a32 32 0 0 0-0.16-45.25L152.31 74a32 32 0 0 0-45.1 45.41z" p-id="2312"></path></svg>'
+        this.closeSpan.innerText = 'fold';
+        this.closeIcon.appendChild(this.closeSpan);
         this.closeIcon.addEventListener('click', ()=>{
             isCloseFlag = !isCloseFlag;
-            (document.getElementsByClassName('neuroglancer-annotation-geneTable-tab')[0] as HTMLElement).style.width = isCloseFlag?'0%':'15%';
+            (document.getElementsByClassName('neuroglancer-annotation-geneTable-tab')[0] as HTMLElement).style.width = isCloseFlag?'40px':'15%';
+            // this.closeIcon.style.left = isCloseFlag ? '40px':'15%';
+            (document.getElementsByClassName('stereomapContaioner')[0] as HTMLElement).style.marginLeft = isCloseFlag ? '40px': '18%';
+            (document.getElementsByClassName('neuroglancer-tab-gene-view-bar')[0] as HTMLElement).style.display = isCloseFlag ? 'none': 'block';
+            // (document.getElementsByClassName('geneTable-head')[0] as HTMLElement).style.width = isCloseFlag ? 'none': 'flex';
+            (document.getElementsByClassName('gene-table')[0] as HTMLElement).style.display = isCloseFlag ? 'none': 'block';
+            (document.getElementsByClassName('el-button--default')[0] as HTMLElement).style.display = isCloseFlag ? 'none': 'block';
+            (document.getElementsByClassName('neuroglancer-annotation-geneTable-tab')[0].getElementsByTagName('input')[0] as HTMLElement).style.display = isCloseFlag ? 'none': 'block';
+            this.closeSpan.innerText = isCloseFlag ? '': 'fold';
             (this.closeIcon.getElementsByClassName('icon')[0] as HTMLElement).style.transform = isCloseFlag ? 'rotate(0deg)':'rotate(180deg)';
-            this.closeIcon.style.left = isCloseFlag ? '0%':'15%';
+            if(isCloseFlag){
+                (document.getElementsByClassName('geneTable-head')[0] as HTMLElement).classList.remove('isFlex');
+                (document.getElementsByClassName('gene-table')[0] as HTMLElement).style.display = 'none'
+            }else{
+                (document.getElementsByClassName('geneTable-head')[0] as HTMLElement).classList.add('isFlex');
+            }
         })
     }
 }

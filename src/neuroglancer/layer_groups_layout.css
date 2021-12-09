@@ -50,3 +50,7 @@
 .neuroglancer-stack-layout-drop-placeholder:first-child, .neuroglancer-stack-layout-drop-placeholder:last-child {
   display: none;
 }
+.stereomapContaioner{
+  margin-left: 18%;
+  transition: margin-left 2s;
+}

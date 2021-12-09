@@ -32,6 +32,7 @@ import {makeCloseButton} from 'neuroglancer/widget/close_button';
 import {makeDeleteButton} from 'neuroglancer/widget/delete_button';
 import {makeIcon} from 'neuroglancer/widget/icon';
 import {PositionWidget} from 'neuroglancer/widget/position_widget';
+import { Tooltip } from '../widget/tooltip';
 
 
 class LayerWidget extends RefCounted {
@@ -161,6 +162,7 @@ export class LayerBar extends RefCounted {
   private layerUpdateNeeded = true;
   private valueUpdateNeeded = false;
   dropZone: HTMLDivElement;
+  tootips = new Tooltip();
   private layerWidgetInsertionPoint = document.createElement('div');
   private positionWidget = this.registerDisposer(new PositionWidget(
       this.viewerNavigationState.position.value, this.manager.root.coordinateSpaceCombiner));
@@ -285,12 +287,14 @@ export class LayerBar extends RefCounted {
     for (let [layer, widget] of this.layerWidgets) {
       let userLayer = layer.layer;
       let text = '';
+      let MIDcount = '';
       if (userLayer !== null) {
         let state = values.get(userLayer);
         if (state !== undefined) {
-          const {value} = state;
+          const {value, geneId} = state;
           if (value !== undefined) {
             text = '' + value;
+            MIDcount = '' + geneId
           }
         }
       }
@@ -300,7 +304,16 @@ export class LayerBar extends RefCounted {
         const length = widget.maxLength = text.length;
         widget.valueElement.style.width = `${length}ch`;
       }
+      let positionx = values.mouseState.position[0];
+      let positiony = values.mouseState.position[1];
       widget.valueElement.textContent = text;
+      this.tootips.element.innerHTML = `(${positionx}, ${positiony})<br>gene counts： ${MIDcount} <br> MID counts： ${text}`
+      if(text){
+        this.tootips.element.style.display = 'block'
+        this.tootips.updatePosition(values.mouseState.pageX, values.mouseState.pageY)
+      }else{
+        this.tootips.element.style.display = 'none'
+      }
     }
   }
 

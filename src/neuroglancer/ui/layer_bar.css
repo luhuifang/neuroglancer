@@ -155,3 +155,26 @@
 .neuroglancer-layer-panel:hover .neuroglancer-layer-item-button-container {
   visibility: visible;
 }
+
+.el-tooltip__popper.is-dark {
+  background: #303133;
+  color: #fff;
+  transform-origin: center bottom; 
+  z-index: 2025; 
+  display: block;
+}
+
+.el-tooltip__popper {
+  position: absolute;
+  border-radius: 4px;
+  padding: 10px;
+  z-index: 2000;
+  font-size: 12px;
+  line-height: 1.2;
+  min-width: 10px;
+  word-wrap: break-word;
+}
+
+.el-tooltip__popper .popper__arrow {
+  border-width: 6px;
+}

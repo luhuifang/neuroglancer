@@ -285,7 +285,6 @@ export class DisplayDimensionsWidget extends RefCounted {
     const {depthGridContainer} = this;
     depthGridContainer.classList.add('neuroglancer-depth-range-widget-grid');
     element.appendChild(depthGridContainer);
-
     const relativeCheckboxLabel = document.createElement('label');
     const relativeCheckbox = document.createElement('input');
     relativeCheckbox.type = 'checkbox';

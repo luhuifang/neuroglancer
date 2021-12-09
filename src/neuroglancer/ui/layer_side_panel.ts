@@ -33,7 +33,7 @@ import {EventActionMap} from 'neuroglancer/util/mouse_bindings';
 import {CheckboxIcon} from 'neuroglancer/widget/checkbox_icon';
 import {makeDeleteButton} from 'neuroglancer/widget/delete_button';
 import {TabView} from 'neuroglancer/widget/tab_view';
-import {geneCloseBtn, GeneTabView} from 'neuroglancer/ui/layer_gene_table_tab'
+import {GeneTabView} from 'neuroglancer/ui/layer_gene_table_tab'
 import { DataSourceView, SourceUrlAutocomplete } from './layer_data_sources_tab';
 
 const layerNameInputEventMap = EventActionMap.fromObject({
@@ -280,9 +280,9 @@ class LayerSidePanel extends SidePanel {
     this.geneView.element.classList.add('neuroglancer-layer-side-panel-tab-view');
     this.geneView.element.style.position = 'relative';
     this.geneView.element.appendChild(this.makeTabDropZone());
-    const closeGeneView = new geneCloseBtn()
+    // const closeGeneView = new geneCloseBtn()
     this.addBody(this.geneView.element);
-    this.addBody(closeGeneView.closeIcon)
+    // this.addBody(closeGeneView.closeIcon)
     // Hide panel automatically if there are no tabs to display (because they have all been moved to
     // another panel).
     this.registerDisposer(panelState.tabsChanged.add(() => {
