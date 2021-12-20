@@ -128,7 +128,7 @@ tr {
     border-color: inherit;
 }
 .neuroglancer-annotation-geneTable-tab .gene-table{
-    height: 75%;
+    height: 70%;
     overflow: auto;
 }
 

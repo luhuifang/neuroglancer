@@ -617,7 +617,7 @@ export abstract class RenderedDataPanel extends RenderedPanel {
     this.updateMousePosition(mouseX, mouseY);
   }
 
-  onMousemove(event: MouseEvent, atOnly = true) {
+  onMousemove(event: MouseEvent, atOnly:boolean = true) {
     const {element} = this;
     if (atOnly && event.target !== element) {
       return;

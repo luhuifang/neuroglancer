@@ -20,6 +20,7 @@
   right: 2px;
   display: flex;
   align-items: start;
+  z-index: 100;
 }
 
 .neuroglancer-data-panel-layout-controls > button {
@@ -48,4 +49,13 @@
 
 .neuroglancer-data-panel-layout-controls > button:hover {
   color: #6ff;
+}
+
+.lassoCanvas{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0.5;
+  color: #cc1e1e;
 }

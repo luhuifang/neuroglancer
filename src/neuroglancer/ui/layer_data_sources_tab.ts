@@ -44,7 +44,6 @@ export class SourceUrlAutocomplete extends AutocompleteTextInput {
   dataSourceView: DataSourceView;
   dirty: WatchableValueInterface<boolean>;
   constructor(dataSourceView: DataSourceView) {
-    console.log(dataSourceView)
     const {manager} = dataSourceView.source.layer;
     const sourceCompleter = (value: string, cancellationToken: CancellationToken) =>
         manager.dataSourceProviderRegistry
@@ -237,29 +236,60 @@ export class LoadedDataSourceView extends RefCounted {
 }
 
 function colorBarScale(value: string){
-  // const ul:Node = makeElement('ul', ['colorBarScale']);
+  console.log(value)
+  // 处理平均每个格子单位量
+  let unit = Math.floor(Number(value)/4);
+  unit = getNearCale(Number(unit));
+  //  获取单个格子像素
+  let unitCalePX = Math.floor(Number( unit ) * 100 / Number(value));
+  let len = Math.ceil(Number(value) / unit);
   const ul = document.createElement('ul');
-  ul.classList.add('colorBarScale')
-  let max = value > '1000'? value.toString().substr(0, value.length - 3): value; 
-  for(let i = 2; i >0; i--){
+  ul.classList.add('colorBarScale');
+  for(let i = len; i >0; i--){
     const li = makeElement('li', ['colorBarScaleli'], {});
-    const a = makeElement('a',[],{'href': 'javascript:void()'}, ( i == 1 ? (0 + '') : value ));
-    console.log(a)
+    li.style.height = i === len ? (100 - (len - 1) * unitCalePX) + 'px': unitCalePX + 'px';
+    let text = i === len ? '' : formatterUnit( i * Number(unit), Number(unit) );
+    const a = makeElement('a',[],{'href': 'javascript:void()'}, ( text.toString() ));
     li.appendChild(a);
     ul.appendChild(li);
   }  
-  console.log(document.getElementsByClassName('colorBarScale'))
+  ul.appendChild(makeElement('a',[],{'href': 'javascript:void()'}, '0'));
   if(document.getElementsByClassName('colorBarScale')[0]){ let dom = document.getElementsByClassName('colorBarScale')[0]; dom.remove()}
   document.body.appendChild(ul)
   // return ul
 }
 
+function formatterUnit(value:number, unitValue: number){
+  let unitArr = ['', 'k', 'M', 'G', 'T'];
+  let unit = Math.floor( (value.toString().length - 1) / 3);   // 用于判断是否单位进制
+  let isFormatterValue = Math.floor( (unitValue.toString().length - 1) / 3);   // 用于判断是否格式化
+  let formatterValue = isFormatterValue > 0 ? unit > 0 ? ( (value / Math.pow(1000,unit)) + unitArr[unit] ) : (value + ''):(value + '');
+  return formatterValue;
+}
+
+function getNearCale(value: number){
+  const scalArr = [5, 10, 15, 20, 30, 50, 100, 200, 300, 500, 1000, 1500, 2000, 5000, 10000, 15000, 18000, 20000, 22000, 25000, 28000, 30000, 35000, 40000, 50000, 100000];
+  let nearCale: number[] = [];
+  scalArr.forEach((item)=>{ 
+    if( (value / item) < 1 && nearCale.length < 1){
+      nearCale.push( value);
+    return;
+    }else if(Math.floor(value / item) === 1){
+      nearCale.push(item)
+    } });
+  let len = nearCale.length
+  return nearCale[len - 1]
+}
+
 export class SelectBinView extends RefCounted{
   selectElement = document.createElement('select');
-  inputValue = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText.split('/');
+  urlJson = JSON.parse( window.decodeURIComponent(window.location.href.split('!')[1]) );
+  url = this.urlJson.layers[0].source;
+  inputValue = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] ? (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText.split('/'): this.url.split('/');
   lastParam:any = this.inputValue.splice(this.inputValue.length - 1, 1)
   constructor(public source: Borrowed<LoadedLayerDataSource>){
     super();
+    // console.log(this.url, this.urlJson)
     this.selectElement.classList.add('neuroglancer-layer-side-panel-type-hq');
     this.selectElement.id = 'hqDefineSelect';
     this.selectElement.style.width = '100%';
@@ -485,7 +515,6 @@ export class LayerDataSourcesTab extends Tab {
           let view = sourceViews.get(source);
           if (view === undefined) {
             view = new DataSourceView(this, source); // urlInput
-            console.log(this)
             view.registerDisposer(view.urlInput.dirty.changed.add(this.reRender));
             sourceViews.set(source, view);
           }

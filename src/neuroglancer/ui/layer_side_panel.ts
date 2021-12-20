@@ -273,7 +273,10 @@ class LayerSidePanel extends SidePanel {
     });
     // geneTable 重置按钮
     this.geneView.button.addEventListener('click',()=>{
-      document.getElementsByClassName('success-row')[0].className = ''
+      geneIdClickCount = 0;
+      if(document.getElementsByClassName('success-row')[0]){
+        document.getElementsByClassName('success-row')[0].className = ''
+      }
       this.changeGeneId( this.urlInput, resetUrl, true);
     });
     this.geneView.element.style.flex = '1';

@@ -237,7 +237,7 @@ export class GeneTabView extends RefCounted {
         if(reqUrl){
             host = reqUrl.split('/')
             url = host[2] + '//' + host[4] + '/' + host[5] +'/annotation/genelist';
-            url = url + '?pagesize=' + 20;
+            url = url + '?pagesize=' + 15;
             url = url + '&pagenum=' + this.pagenum;
             url = this.filterparam?url + '&filterparam=' + this.filterparam : url;
             url = this.sortname?url + '&sort={"name":"' + this.sortname + '","isAsc":' + this.isasc+'}' : url;
@@ -266,7 +266,7 @@ export class geneCloseBtn extends RefCounted {
             // this.closeIcon.style.left = isCloseFlag ? '40px':'15%';
             (document.getElementsByClassName('stereomapContaioner')[0] as HTMLElement).style.marginLeft = isCloseFlag ? '40px': '18%';
             (document.getElementsByClassName('neuroglancer-tab-gene-view-bar')[0] as HTMLElement).style.display = isCloseFlag ? 'none': 'block';
-            // (document.getElementsByClassName('geneTable-head')[0] as HTMLElement).style.width = isCloseFlag ? 'none': 'flex';
+            (document.getElementsByClassName('geneTable-head')[0] as HTMLElement).style.display = isCloseFlag ? 'none': 'flex';
             (document.getElementsByClassName('gene-table')[0] as HTMLElement).style.display = isCloseFlag ? 'none': 'block';
             (document.getElementsByClassName('el-button--default')[0] as HTMLElement).style.display = isCloseFlag ? 'none': 'block';
             (document.getElementsByClassName('neuroglancer-annotation-geneTable-tab')[0].getElementsByTagName('input')[0] as HTMLElement).style.display = isCloseFlag ? 'none': 'block';

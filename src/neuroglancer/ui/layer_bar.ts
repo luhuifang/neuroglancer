@@ -34,7 +34,6 @@ import {makeIcon} from 'neuroglancer/widget/icon';
 import {PositionWidget} from 'neuroglancer/widget/position_widget';
 import { Tooltip } from '../widget/tooltip';
 
-
 class LayerWidget extends RefCounted {
   element = document.createElement('div');
   layerNumberElement = document.createElement('div');
@@ -164,26 +163,28 @@ export class LayerBar extends RefCounted {
   dropZone: HTMLDivElement;
   tootips = new Tooltip();
   private layerWidgetInsertionPoint = document.createElement('div');
+  private positionx: number;
+  private positiony: number;
   private positionWidget = this.registerDisposer(new PositionWidget(
-      this.viewerNavigationState.position.value, this.manager.root.coordinateSpaceCombiner));
-  /**
-   * For use within this module only.
-   */
-  dropLayers: DropLayers|undefined;
-
-  dragEnterCount = 0;
-
-  get layerManager() {
-    return this.manager.layerManager;
-  }
-
-  constructor(
+    this.viewerNavigationState.position.value, this.manager.root.coordinateSpaceCombiner));
+    /**
+     * For use within this module only.
+     */
+    dropLayers: DropLayers|undefined;
+    
+    dragEnterCount = 0;
+    
+    get layerManager() {
+      return this.manager.layerManager;
+    }
+    
+    constructor(
       public display: DisplayContext, public manager: LayerListSpecification,
       public viewerNavigationState: LinkedViewerNavigationState,
       public selectedLayer: Owned<SelectedLayerState>, public getLayoutSpecForDrag: () => any,
       public showLayerHoverValues: WatchableValueInterface<boolean>) {
-    super();
-    this.registerDisposer(selectedLayer);
+        super();
+        this.registerDisposer(selectedLayer);
     const {element} = this;
     element.className = 'neuroglancer-layer-panel';
     this.registerDisposer(manager.layerSelectedValues.changed.add(() => {
@@ -274,10 +275,12 @@ export class LayerBar extends RefCounted {
   handleLayerItemValueChanged() {
     this.element.dataset.showHoverValues = this.showLayerHoverValues.value.toString()
   }
-
-  private scheduleUpdate = this.registerCancellable(animationFrameDebounce(() => this.update()));
-
-  private update() {
+  private scheduleUpdate = this.registerCancellable(animationFrameDebounce(() => this.update()))
+  update() {
+    // document.getElementsByClassName('neuroglancer-rendered-data-panel')[0].getElementsByClassName('neuroglancer-data-panel-layout-controls')[0].appendChild(this.lassoResult.lasso)
+    // this.lassoResult.lasso.addEventListener('click',()=>{
+    //   this.lassoResult.c.style.zIndex = '88';
+    // })
     this.valueUpdateNeeded = false;
     this.updateLayers();
     if (this.showLayerHoverValues.value === false) {
@@ -304,10 +307,10 @@ export class LayerBar extends RefCounted {
         const length = widget.maxLength = text.length;
         widget.valueElement.style.width = `${length}ch`;
       }
-      let positionx = values.mouseState.position[0];
-      let positiony = values.mouseState.position[1];
+      this.positionx = values.mouseState.position[0];
+      this.positiony = values.mouseState.position[1];
       widget.valueElement.textContent = text;
-      this.tootips.element.innerHTML = `(${positionx}, ${positiony})<br>gene counts： ${MIDcount} <br> MID counts： ${text}`
+      this.tootips.element.innerHTML = `(${this.positionx}, ${this.positiony})<br>gene counts： ${MIDcount} <br> MID counts： ${text}`;
       if(text){
         this.tootips.element.style.display = 'block'
         this.tootips.updatePosition(values.mouseState.pageX, values.mouseState.pageY)

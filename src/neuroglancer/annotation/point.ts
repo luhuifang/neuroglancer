@@ -167,8 +167,10 @@ emitAnnotation(vec4(color.rgb, color.a * ${this.getCrossSectionFadeFactor()}));
       case 3:
         this.enable(this.shaderGetter3d, context, shader => {
           const {gl} = shader;
-          let isBin = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText.includes('bin');
-          let binSizes:any = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText.split('/');
+          let urlJson = JSON.parse( window.decodeURIComponent(window.location.href.split('!')[1]) );
+          let url = urlJson.layers[0].source;
+          let isBin = url.includes('bin');
+          let binSizes:any = url.split('/');
           binSizes = isBin ? Number(binSizes[binSizes.length -1].substr(3)): 1.0;
           let pointsize = 1.0 / hqDefineScale * binSizes;
           gl.vertexAttrib1f(shader.attribute('aPointSize'),pointsize);
@@ -183,8 +185,10 @@ emitAnnotation(vec4(color.rgb, color.a * ${this.getCrossSectionFadeFactor()}));
             numChunkDisplayDims === 2 ? this.shaderGetter2d : this.shaderGetter1d, context,
             shader => {
               const {gl} = shader;
-              let isBin = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText.includes('bin');
-              let binSizes:any = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText.split('/');
+              let urlJson = JSON.parse( window.decodeURIComponent(window.location.href.split('!')[1]) );
+              let url = urlJson.layers[0].source;
+              let isBin = url.includes('bin');
+              let binSizes:any = url.split('/');
               binSizes = isBin ? Number(binSizes[binSizes.length -1].substr(3)): 1.0;
               let pointsize = 1.0 / hqDefineScale * binSizes;
               gl.vertexAttrib1f(shader.attribute('aPointSize'),pointsize);

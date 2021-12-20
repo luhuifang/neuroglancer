@@ -1261,7 +1261,6 @@ export function UserLayerWithAnnotationsMixin<TBase extends {new (...args: any[]
       this.annotationDisplayState.color.changed.add(this.specificationChanged.dispatch);
       this.annotationDisplayState.shader.changed.add(this.specificationChanged.dispatch);
       this.annotationDisplayState.shaderControls.changed.add(this.specificationChanged.dispatch);
-      console.log(this.annotationDisplayState.shaderControls.changed.add(this.specificationChanged.dispatch)) 
       this.tabs.add(
           'annotations', {label: 'Annotations', order: 10, getter: () => new AnnotationTab(this)});
       let annotationStateReadyBinding: (() => void)|undefined;
