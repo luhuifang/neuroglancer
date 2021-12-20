@@ -633,8 +633,8 @@ function parseAnnotations(
     buffer: ArrayBuffer, parameters: AnnotationSourceParameters,
     propertySerializer: AnnotationPropertySerializer): AnnotationGeometryData {
   const dv = new DataView(buffer);
-  if (buffer.byteLength <= 8) throw new Error('Expected at least 8 bytes');
-  const countLow = dv.getUint32(0, /*littleEndian=*/ true);
+  if (buffer.byteLength < 8) throw new Error('Expected at least 8 bytes');
+  const countLow = dv.getUint32(0, /*littleEndian=*/ true); // 点的数目总数
   const countHigh = dv.getUint32(4, /*littleEndian=*/ true);
   if (countHigh !== 0) throw new Error('Annotation count too high');
   const numBytes = annotationTypeHandlers[parameters.type].serializedBytes(parameters.rank) +
