@@ -277,10 +277,6 @@ export class LayerBar extends RefCounted {
   }
   private scheduleUpdate = this.registerCancellable(animationFrameDebounce(() => this.update()))
   update() {
-    // document.getElementsByClassName('neuroglancer-rendered-data-panel')[0].getElementsByClassName('neuroglancer-data-panel-layout-controls')[0].appendChild(this.lassoResult.lasso)
-    // this.lassoResult.lasso.addEventListener('click',()=>{
-    //   this.lassoResult.c.style.zIndex = '88';
-    // })
     this.valueUpdateNeeded = false;
     this.updateLayers();
     if (this.showLayerHoverValues.value === false) {

@@ -340,7 +340,7 @@ export class SliceViewPanel extends RenderedDataPanel {
         position[displayDimensionIndices[i]] = tempVec3[i];
       }
     };
-
+    
     let {unsnappedPosition} = mouseState;
     if (unsnappedPosition.length !== rank) {
       unsnappedPosition = mouseState.unsnappedPosition = new Float32Array(rank);

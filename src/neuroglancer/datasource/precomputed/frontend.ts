@@ -717,6 +717,7 @@ async function getAnnotationDataSource(
       },
     ],
   };
+  console.log(dataSource)
   return dataSource;
 }
 

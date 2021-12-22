@@ -177,36 +177,48 @@ function tools(layerSelectedValues: LayerSelectedValues, sliceView: SliceViewPan
     isLasso(true, layerSelectedValues, sliceView);
     (document.getElementById('lassoCanvas') as HTMLElement).style.zIndex = '88';
     lasso.setAttribute('isclicked', 'true');
-
   })
   return lasso
 }
 
 function isLasso(value:boolean, layerSelectedValues: LayerSelectedValues, sliceView:SliceViewPanel ){
-  let c = document.createElement('canvas');
+  console.log(layerSelectedValues)
+  let canvas = document.createElement('canvas');
+  canvas.setAttribute('width','82%');
+  canvas.setAttribute('height','100%');
   let result:any = [];
-  c.id = 'lassoCanvas';
-  let flag:boolean = value;
+  canvas.id = 'lassoCanvas';
   let offset = 0;
-  c.classList.add('lassoCanvas');
-    document.getElementsByClassName('neuroglancer-rendered-data-panel')[0].appendChild(c)
-    var w = c.width = window.innerWidth;
-    var h = c.height = window.innerHeight;
-    var ctx:CanvasRenderingContext2D|null = c.getContext('2d');
+  canvas.classList.add('lassoCanvas');
+    document.getElementsByClassName('neuroglancer-rendered-data-panel')[0].appendChild(canvas)
+    var w = canvas.width = window.innerWidth;
+    var h = canvas.height = window.innerHeight;
+    var ctx:CanvasRenderingContext2D|null = canvas.getContext('2d');
     var points:any = [];
-    let smoothLine = (points:any) =>{
-        ctx!.fillStyle="#fff";
-        ctx!.fill();
-        ctx!.lineWidth = 4;
-        ctx!.strokeStyle = '#FFF';
-        ctx!.lineTo(points[points.length - 1].x, points[points.length - 1].y);
-        ctx!.fillStyle="#0b3887";
-        ctx!.fill('evenodd');
-        ctx!.setLineDash([5, 4, 3]);
-        march();
-        ctx!.lineDashOffset = offset;
-        ctx!.stroke();
+    var drawNow = false;
+    var paths:any = [];
+    const draw = () => {
+      paths = [];
+      for (var i = 0; i < points.length; i++) {
+        if (i == 0) {
+          paths[i] = new Path2D();
+        } else {
+          paths[i] = new Path2D(paths[i - 1]);
+        }
+        paths[i].moveTo(points[i][0].x, points[i][0].y);
+        for (var j = 1; j < points[i].length; j++) {
+          paths[i].lineTo(points[i][j].x, points[i][j].y);
+        }
+      }
+      ctx!.clearRect(0, 0, w, h);
+      ctx!.fillStyle = "#fff";
+      ctx!.fill(paths[paths.length - 1], 'evenodd')
+      ctx!.setLineDash([5, 4, 3]);
+      march();
+      ctx!.lineDashOffset = offset;
+      ctx!.stroke(paths[paths.length - 1]);
     }
+    // 增加边缘闪动
   let march = () => {
     offset++;
     if (offset > 15) {
@@ -214,32 +226,52 @@ function isLasso(value:boolean, layerSelectedValues: LayerSelectedValues, sliceV
     }
     setTimeout(march, 20);
   };
+  // 去重
   const removeRepeat2 = (arr:[]) => {
     const obj={};
     arr.forEach(item=> !obj[ item.toString() ] && (obj[item.toString()]=item));
     return Object.values(obj);
   };
-  c.onmousedown = function (e) {
-    ctx!.beginPath();
-    let firstPoint = [{x: e.clientX, y:e.clientY}];
-      points.push({x: e.clientX, y: e.clientY});
-      smoothLine(points);
-      c.onmousemove = function (e) {
-        sliceView.onMousemove(e,false)
-        if(value){
-          result.push([layerSelectedValues.mouseState.position[0],layerSelectedValues.mouseState.position[1]])
+  canvas.onmousedown = function (e) {
+    drawNow = true;
+    points.push([]);
+    points[points.length - 1].push({ x: e.offsetX, y: e.offsetY });
+    canvas.onmousemove = function (e) {
+      if (drawNow) {
+        sliceView.onMousemove(e,false);
+        // result.push([layerSelectedValues.mouseState.position[0],layerSelectedValues.mouseState.position[1]]);
+        points[points.length - 1].push({ x: e.offsetX, y: e.offsetY });
+        draw();
+      }
+    };
+    canvas.onmouseup = function () {
+      drawNow = false;
+      result = removeRepeat2(result);
+      getPosition(points);
+      (document.getElementById('lassoCanvas') as HTMLElement).style.zIndex = '-1';
+    };
+};
+  // 获取spot坐标
+  let getPosition = (arr:any[])=>{
+    let newarr = arr.flat();
+    console.log(newarr)
+    var x = newarr.sort((a, b)=>{ return a.x - b.x });
+    var xMin = x[0].x;
+    var xMax = x[x.length - 1].x;
+    var y = newarr.sort((a, b)=>{ return a.y - b.y });
+    var yMin = y[0].y;
+    var yMax = y[y.length - 1].y;
+    result.shift();
+    for(let i = xMin; i < xMax; i++){
+      for(let j = yMin; j < yMax; j++){
+        if(ctx!.isPointInPath(i, j)){
+          sliceView.handleMouseMove(i, j);
+          result.push([layerSelectedValues.mouseState.position[0],layerSelectedValues.mouseState.position[1]]);
         }
-        points.push({x: e.clientX, y: e.clientY});
-        smoothLine(points);
-      };
-      c.addEventListener('mouseup',function () {
-        c.onmousemove = null;
-        c.onmouseup = null;
-        ctx!.closePath();
-        smoothLine(firstPoint)
-        result = removeRepeat2(result)
-      });
-  };
+      }
+    };
+    console.log(result)
+  }
 }
 
 function registerRelatedLayouts(

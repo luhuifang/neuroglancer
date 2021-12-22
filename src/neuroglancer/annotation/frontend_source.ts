@@ -78,6 +78,7 @@ export class AnnotationSubsetGeometryChunk extends Chunk {
     super(source);
     if (x.data !== undefined) {
       this.data = new AnnotationGeometryData(x);
+      console.log(this.data)
     }
   }
 

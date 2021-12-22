@@ -103,6 +103,9 @@ export class RPC {
   constructor(public target: RPCTarget) {
     target.onmessage = (e) => {
       let data = e.data;
+      if(data.functionName == 'Chunk.update'){
+        console.log(data)
+      }
       if (DEBUG_MESSAGES) {
         console.log('Received message', data);
       }

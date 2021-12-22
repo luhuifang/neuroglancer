@@ -88,7 +88,7 @@ export const pickOffsetSequence = (() => {
     const y2 = (b - x2) / pickDiameter;
     return getDist2(x1, y1) - getDist2(x2, y2);
   });
-
+  console.log(offsets)
   return offsets;
 })();
 
