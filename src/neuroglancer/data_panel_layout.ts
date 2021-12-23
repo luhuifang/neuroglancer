@@ -189,6 +189,8 @@ function isLasso(value:boolean, layerSelectedValues: LayerSelectedValues, sliceV
   let result:any = [];
   canvas.id = 'lassoCanvas';
   let offset = 0;
+  var xreduce = 0;
+  var yreduce  = 0;
   canvas.classList.add('lassoCanvas');
     document.getElementsByClassName('neuroglancer-rendered-data-panel')[0].appendChild(canvas)
     var w = canvas.width = window.innerWidth;
@@ -211,7 +213,7 @@ function isLasso(value:boolean, layerSelectedValues: LayerSelectedValues, sliceV
         }
       }
       ctx!.clearRect(0, 0, w, h);
-      ctx!.fillStyle = "#fff";
+      ctx!.fillStyle = "green";
       ctx!.fill(paths[paths.length - 1], 'evenodd')
       ctx!.setLineDash([5, 4, 3]);
       march();
@@ -235,42 +237,53 @@ function isLasso(value:boolean, layerSelectedValues: LayerSelectedValues, sliceV
   canvas.onmousedown = function (e) {
     drawNow = true;
     points.push([]);
-    points[points.length - 1].push({ x: e.offsetX, y: e.offsetY });
+    xreduce = e.clientX - e.offsetX;
+    yreduce = e.clientY - e.offsetY;
+    points[points.length - 1].push({ x: e.offsetX, y: e.offsetY , clientx: e.clientX, clienty: e.clientX});
     canvas.onmousemove = function (e) {
       if (drawNow) {
-        sliceView.onMousemove(e,false);
-        // result.push([layerSelectedValues.mouseState.position[0],layerSelectedValues.mouseState.position[1]]);
-        points[points.length - 1].push({ x: e.offsetX, y: e.offsetY });
+        sliceView.handleMouseMove(e.clientX, e.clientY);
+        // sliceView.handleMouseMove(e.clientX+20, e.clientY+20);
+        // layerSelectedValues.mouseState.setActive(true);
+        result.push([layerSelectedValues.mouseState.position[0],layerSelectedValues.mouseState.position[1]]);
+        points[points.length - 1].push({ x: e.offsetX, y: e.offsetY , clientx: e.clientX, clienty: e.clientX});
+        getPosition(points);
         draw();
       }
     };
     canvas.onmouseup = function () {
       drawNow = false;
+      // getPosition(points);
+      result.shift();
       result = removeRepeat2(result);
-      getPosition(points);
       (document.getElementById('lassoCanvas') as HTMLElement).style.zIndex = '-1';
+      console.log(result)
     };
 };
   // 获取spot坐标
   let getPosition = (arr:any[])=>{
     let newarr = arr.flat();
-    console.log(newarr)
     var x = newarr.sort((a, b)=>{ return a.x - b.x });
     var xMin = x[0].x;
     var xMax = x[x.length - 1].x;
     var y = newarr.sort((a, b)=>{ return a.y - b.y });
     var yMin = y[0].y;
     var yMax = y[y.length - 1].y;
-    result.shift();
+    ctx!.rect(xMin, yMin, xMax - xMin, yMax- yMin);
+    ctx!.stroke();
+    ctx!.strokeStyle = '#000';
     for(let i = xMin; i < xMax; i++){
       for(let j = yMin; j < yMax; j++){
-        if(ctx!.isPointInPath(i, j)){
-          sliceView.handleMouseMove(i, j);
+        if(ctx!.isPointInPath(i, j, 'evenodd') && ctx!.getImageData(i, j, 1, 1).data[1] == 128){
+          // sliceView.handleMouseMove(i+xreduce, j+yreduce);
+          // sliceView.pickRequests[0].glWindowX = i+xreduce;
+          // sliceView.pickRequests[0].glWindowY = j+yreduce;
+          // sliceView.attemptToIssuePickRequest();
           result.push([layerSelectedValues.mouseState.position[0],layerSelectedValues.mouseState.position[1]]);
+        }else{
         }
       }
     };
-    console.log(result)
   }
 }
 

@@ -305,7 +305,6 @@ export class TabView extends RefCounted {
     const {element, tabBar} = this;
     element.className = 'neuroglancer-tab-view';
     tabBar.className = 'neuroglancer-tab-view-bar';
-    console.log(this)
     element.appendChild(tabBar);
     this.registerDisposer(visibility.changed.add(this.debouncedUpdateView));
     const stack = this.stack = this.registerDisposer(new StackView<string>(

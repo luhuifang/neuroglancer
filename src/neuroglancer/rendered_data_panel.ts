@@ -88,7 +88,6 @@ export const pickOffsetSequence = (() => {
     const y2 = (b - x2) / pickDiameter;
     return getDist2(x1, y1) - getDist2(x2, y2);
   });
-  console.log(offsets)
   return offsets;
 })();
 
@@ -333,13 +332,12 @@ export abstract class RenderedDataPanel extends RenderedPanel {
     return true;
   }
 
-  private attemptToIssuePickRequest() {
+  public attemptToIssuePickRequest() {
     if (!this.canIssuePickRequest()) return;
     const currentFrameNumber = this.context.frameNumber;
     const {gl} = this;
 
     const {pickRequests} = this;
-
     // Try to find an available PickRequest object.
 
     for (const pickRequest of pickRequests) {

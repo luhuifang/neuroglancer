@@ -277,7 +277,11 @@ class LayerSidePanel extends SidePanel {
       if(document.getElementsByClassName('success-row')[0]){
         document.getElementsByClassName('success-row')[0].className = ''
       }
-      this.changeGeneId( this.urlInput, resetUrl, true);
+      resetUrl = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText.split('/');
+      var len = resetUrl.indexOf('gene');
+      resetUrl.splice(len, 2, 'dnb');
+      var newUrl = resetUrl.join('/')
+      this.changeGeneId( this.urlInput, newUrl, true);
     });
     this.geneView.element.style.flex = '1';
     this.geneView.element.classList.add('neuroglancer-layer-side-panel-tab-view');

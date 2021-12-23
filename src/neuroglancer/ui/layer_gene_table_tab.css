@@ -22,9 +22,6 @@
     font-weight: bold;
     transition: diplay 2s;
 }
-.neuroglancer-annotation-geneTable-tab .isFlex{
-    display: flex;
-}
 .neuroglancer-annotation-geneTable-tab .el-table{
     border: 1px solid #ebebeb;
  }
@@ -97,7 +94,7 @@
     flex-direction: column;
     align-items: center;
     height: 34px;
-    width: 24px;
+    width: 19px;
     vertical-align: middle;
     cursor: pointer;
     overflow: initial;
@@ -201,14 +198,14 @@ tr {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.el-pagination {
+.gene-table .el-pagination {
     white-space: nowrap;
     padding: 2px 5px;
     color: #303133;
     font-weight: 700;
     padding: 8px;
-	display: flex;
-	justify-content: space-around;
+	/* display: flex;
+	justify-content: space-around; */
 }
 .el-pager {
     user-select: none;
@@ -218,10 +215,7 @@ tr {
     font-size: 0;
     padding: 0;
     margin: 0;
-}
-.el-pagination:after, .el-pagination:before {
-    display: table;
-    content: "";
+    width: 60%;
 }
 .el-pagination .btn-next, .el-pagination .btn-prev {padding: 0;}
 .el-pagination button {border: none;cursor: pointer;}
@@ -250,19 +244,14 @@ tr {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-.el-pagination:after, .el-pagination:before {
-    display: table;
-    content: "";
-}
 .el-pagination:after {clear: both;}
-.el-pagination .el-pager{display: flex;}
-.el-pagination .el-pager input{	width: 30%;text-align: center;}
+.el-pagination .el-pager input{	width: 30%;text-align: center;display: inline-block;}
 .el-pagination .el-pager p {
     margin: 0 5px;
     color: #606266;
-	width: 30%;
 	font-size: 15px;
     text-align: center;
+    display: inline-block;
 }
 
 .neuroglancer-annotation-geneTable-tab .el-button {

@@ -351,7 +351,6 @@ export class AnnotationUserLayer extends Base {
     this.tabs.add(
         'rendering',
         {label: 'Rendering', order: -100, getter: () => new RenderingOptionsTab(this)});
-        console.log('this.tabs',this.tabs)
     this.tabs.default = 'annotations';
   }
 
