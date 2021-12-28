@@ -26,6 +26,7 @@ import {ShaderBuilder, ShaderProgram} from 'neuroglancer/webgl/shader';
 import {defineVectorArrayVertexShaderInput} from 'neuroglancer/webgl/shader_lib';
 import {defineVertexId, VertexIdHelper} from 'neuroglancer/webgl/vertex_id';
 import { hqDefineScale } from '../navigation_state';
+import {viewer} from 'src/main'
 class RenderHelper extends AnnotationRenderHelper {
   private defineShaderCommon(builder: ShaderBuilder) {
     const {rank} = this;
@@ -167,8 +168,7 @@ emitAnnotation(vec4(color.rgb, color.a * ${this.getCrossSectionFadeFactor()}));
       case 3:
         this.enable(this.shaderGetter3d, context, shader => {
           const {gl} = shader;
-          let urlJson = JSON.parse( window.decodeURIComponent(window.location.href.split('!')[1]) );
-          let url = urlJson.layers[0].source;
+          let url = viewer.state.toJSON().layers[0].source;
           let isBin = url.includes('bin');
           let binSizes:any = url.split('/');
           binSizes = isBin ? Number(binSizes[binSizes.length -1].substr(3)): 1.0;
@@ -185,8 +185,7 @@ emitAnnotation(vec4(color.rgb, color.a * ${this.getCrossSectionFadeFactor()}));
             numChunkDisplayDims === 2 ? this.shaderGetter2d : this.shaderGetter1d, context,
             shader => {
               const {gl} = shader;
-              let urlJson = JSON.parse( window.decodeURIComponent(window.location.href.split('!')[1]) );
-              let url = urlJson.layers[0].source;
+              let url = viewer.state.toJSON().layers[0].source;
               let isBin = url.includes('bin');
               let binSizes:any = url.split('/');
               binSizes = isBin ? Number(binSizes[binSizes.length -1].substr(3)): 1.0;

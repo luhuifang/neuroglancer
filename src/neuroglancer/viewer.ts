@@ -26,7 +26,7 @@ import {CapacitySpecification, ChunkManager, ChunkQueueManager, FrameNumberCount
 import {makeCoordinateSpace, TrackableCoordinateSpace} from 'neuroglancer/coordinate_transform';
 import {defaultCredentialsManager} from 'neuroglancer/credentials_provider/default_manager';
 import {InputEventBindings as DataPanelInputEventBindings} from 'neuroglancer/data_panel_layout';
-import {DataSourceProviderRegistry} from 'neuroglancer/datasource';
+import {DataSource, DataSourceProviderRegistry} from 'neuroglancer/datasource';
 import {getDefaultDataSourceProvider} from 'neuroglancer/datasource/default_provider';
 import {StateShare, stateShareEnabled} from 'neuroglancer/datasource/state_share';
 import {DisplayContext, TrackableWindowedViewport} from 'neuroglancer/display_context';
@@ -324,7 +324,7 @@ export class Viewer extends RefCounted implements ViewerState {
   inputEventBindings: InputEventBindings;
   element: HTMLElement;
   dataSourceProvider: Borrowed<DataSourceProviderRegistry>;
-
+  dataSource: DataSource;
   uiConfiguration: ViewerUIConfiguration;
 
   private makeUiControlVisibilityState(key: keyof ViewerUIOptions) {

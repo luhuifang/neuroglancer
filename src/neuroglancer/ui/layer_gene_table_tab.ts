@@ -5,6 +5,7 @@ import { TabView } from '../widget/tab_view';
 import { cancellableFetchSpecialOk } from '../util/special_protocol_request';
 import { responseJson } from '../util/http_request';
 import 'neuroglancer/ui/layer_gene_table_tab.css'
+import { viewer } from 'src/main';
 
 let reqUrl: any;
 // 创建一个element
@@ -234,6 +235,8 @@ export class GeneTabView extends RefCounted {
     getGeneTabledata(): Promise<any> {
         let host:any
         let url:any;
+        reqUrl = reqUrl ? reqUrl : viewer.state.toJSON().layers[0].source;
+        console.log(reqUrl)
         if(reqUrl){
             host = reqUrl.split('/')
             url = host[2] + '//' + host[4] + '/' + host[5] +'/annotation/genelist';

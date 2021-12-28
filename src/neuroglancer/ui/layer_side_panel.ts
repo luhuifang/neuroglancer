@@ -35,6 +35,7 @@ import {makeDeleteButton} from 'neuroglancer/widget/delete_button';
 import {TabView} from 'neuroglancer/widget/tab_view';
 import {GeneTabView} from 'neuroglancer/ui/layer_gene_table_tab'
 import { DataSourceView, SourceUrlAutocomplete } from './layer_data_sources_tab';
+import { viewer } from 'src/main';
 
 const layerNameInputEventMap = EventActionMap.fromObject({
   'escape': {action: 'cancel'},
@@ -259,7 +260,7 @@ class LayerSidePanel extends SidePanel {
       geneIdClickCount++;
       // 记录点选geneId前的url路径，为resetButton做准备
       if(geneIdClickCount === 1){
-        resetUrl = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText;
+        resetUrl = viewer.state.toJSON().layers[0].source;
       }
       // 清空上一个点选内容
       if(document.getElementsByClassName('success-row')[0]){
@@ -277,7 +278,7 @@ class LayerSidePanel extends SidePanel {
       if(document.getElementsByClassName('success-row')[0]){
         document.getElementsByClassName('success-row')[0].className = ''
       }
-      resetUrl = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText.split('/');
+      resetUrl = viewer.state.toJSON().layers[0].source.split('/');
       var len = resetUrl.indexOf('gene');
       resetUrl.splice(len, 2, 'dnb');
       var newUrl = resetUrl.join('/')
@@ -301,7 +302,7 @@ class LayerSidePanel extends SidePanel {
   changeGeneId(urlInput: SourceUrlAutocomplete, value:any, flag:boolean = false){
     let lastParam:any = ''
     if(!flag){
-      let inputValue = (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText?.split('/');
+      let inputValue = viewer.state.toJSON().layers[0].source.split('/');
       // 判断是否包含bin
       let num = inputValue.includes('bin')?1:2;
       inputValue.splice(inputValue.indexOf('annotation') + 1, inputValue.length - num - inputValue.indexOf('annotation'), 'gene/'+value);

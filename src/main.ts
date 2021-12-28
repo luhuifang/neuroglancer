@@ -18,7 +18,27 @@
  * @file Main entry point for default neuroglancer viewer.
  */
 import {setupDefaultViewer} from 'neuroglancer/ui/default_viewer_setup';
-
+import { Viewer } from './neuroglancer/viewer';
+export let viewer: Viewer;
 window.addEventListener('DOMContentLoaded', () => {
-  setupDefaultViewer();
+  // setupDefaultViewer();
+  viewer = setupDefaultViewer();
+  let json = viewer.state.toJSON();
+  console.log('setupDefaultViewer before: ', json);
+  json.layout = 'xy';
+  if(json.layers == undefined){
+    json.layers = [{
+      "type": "annotation",
+      "source": "precomputed://http://10.225.5.208:5000/test/annotation/dnb/bin100",
+      "tab": "source",
+      "name": "bin100"
+    }]
+  }else{
+    json.layers[0].source = 'precomputed://http://10.225.5.208:5000/test/annotation/dnb/bin100';
+    json.layers[0].type = 'annotation';
+  }
+  console.log('setupDefaultViewer after: ', json);
+  viewer.state.reset();
+  viewer.state.restoreState(json);
+  console.log('setupDefaultViewer: ', viewer.state.toJSON());
 });

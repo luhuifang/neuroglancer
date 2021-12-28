@@ -39,6 +39,7 @@ import {CoordinateSpaceTransformWidget} from 'neuroglancer/widget/coordinate_tra
 import {AutocompleteTextInput, makeCompletionElementWithDescription} from 'neuroglancer/widget/multiline_autocomplete';
 import {Tab} from 'neuroglancer/widget/tab_view';
 import { makeElement } from './layer_gene_table_tab';
+import { viewer } from 'src/main';
 
 export class SourceUrlAutocomplete extends AutocompleteTextInput {
   dataSourceView: DataSourceView;
@@ -281,9 +282,9 @@ function getNearCale(value: number){
 
 export class SelectBinView extends RefCounted{
   selectElement = document.createElement('select');
-  urlJson = JSON.parse( window.decodeURIComponent(window.location.href.split('!')[1]) );
-  url = this.urlJson.layers[0].source;
-  inputValue = document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] ? (document.getElementsByClassName('neuroglancer-multiline-autocomplete-input')[0] as HTMLInputElement).innerText.split('/'): this.url.split('/');
+  // urlJson = JSON.parse( window.decodeURIComponent(window.location.href.split('!')[1]) );
+  url = viewer.state.toJSON().layers[0].source;
+  inputValue = this.url.split('/');
   lastParam:any = this.inputValue.splice(this.inputValue.length - 1, 1)
   constructor(public source: Borrowed<LoadedLayerDataSource>){
     super();
@@ -291,7 +292,9 @@ export class SelectBinView extends RefCounted{
     this.selectElement.classList.add('neuroglancer-layer-side-panel-type-hq');
     this.selectElement.id = 'hqDefineSelect';
     this.selectElement.style.width = '100%';
-    let binList = source.dataSource.subsources[0].subsource.annotation?.metadata?.binlist
+    let binList = source.dataSource.subsources[0].subsource.annotation?.metadata?.binlist;
+    viewer.dataSource = source.dataSource
+    console.log(viewer.state.toJSON(), viewer)
     this.selectElement.style.display = binList?'block':'none';
     this.registerDisposer(() => removeFromParent(this.selectElement));
     if(binList?.length>0 && binList.includes(this.lastParam[0])){

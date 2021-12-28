@@ -35,7 +35,6 @@ export function getSelectedAnnotation(mouseState: MouseSelectionState, layerMana
   if (managedLayer === undefined) {
     return undefined;
   }
-
   return {
     layer: managedLayer,
     annotationLayer,

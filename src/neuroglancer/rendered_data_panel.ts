@@ -213,7 +213,7 @@ export abstract class RenderedDataPanel extends RenderedPanel {
       glWindowX: number, glWindowY: number, data: Float32Array,
       pickingData: FramePickingData): void;
 
-  private completePickInternal(pickRequest: PickRequest) {
+  completePickInternal(pickRequest: PickRequest) {
     const {gl} = this;
     const {pickBufferContents} = this;
     gl.bindBuffer(WebGL2RenderingContext.PIXEL_PACK_BUFFER, pickRequest.buffer);

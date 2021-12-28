@@ -42,7 +42,10 @@ import {VisibilityPrioritySpecification} from 'neuroglancer/viewer_state';
 import {DisplayDimensionsWidget} from 'neuroglancer/widget/display_dimensions_widget';
 import {ScaleBarOptions} from 'neuroglancer/widget/scale_bar';
 import { makeElement } from './ui/layer_gene_table_tab';
-
+import { MessageBox } from './widget/message_box';
+import { viewer } from 'src/main';
+import { cancellableFetchSpecialOk } from './util/special_protocol_request';
+import { responseJson } from './util/http_request';
 export interface SliceViewViewerState {
   chunkManager: ChunkManager;
   navigationState: NavigationState;
@@ -191,6 +194,7 @@ function isLasso(value:boolean, layerSelectedValues: LayerSelectedValues, sliceV
   let offset = 0;
   var xreduce = 0;
   var yreduce  = 0;
+  let lastParamBin:string = '';
   canvas.classList.add('lassoCanvas');
     document.getElementsByClassName('neuroglancer-rendered-data-panel')[0].appendChild(canvas)
     var w = canvas.width = window.innerWidth;
@@ -243,23 +247,106 @@ function isLasso(value:boolean, layerSelectedValues: LayerSelectedValues, sliceV
     canvas.onmousemove = function (e) {
       if (drawNow) {
         sliceView.handleMouseMove(e.clientX, e.clientY);
-        // sliceView.handleMouseMove(e.clientX+20, e.clientY+20);
         // layerSelectedValues.mouseState.setActive(true);
         result.push([layerSelectedValues.mouseState.position[0],layerSelectedValues.mouseState.position[1]]);
         points[points.length - 1].push({ x: e.offsetX, y: e.offsetY , clientx: e.clientX, clienty: e.clientX});
-        getPosition(points);
         draw();
       }
     };
     canvas.onmouseup = function () {
       drawNow = false;
-      // getPosition(points);
+      getPosition(points);
       result.shift();
       result = removeRepeat2(result);
       (document.getElementById('lassoCanvas') as HTMLElement).style.zIndex = '-1';
       console.log(result)
+      let message = showMessageBox('Run analysis', getMessageContent());
+      document.getElementsByClassName('el-message-box__btns')[0].addEventListener('click', ()=>{
+        submit();
+        message.element.style.display = 'none';
+        message.dispose();
+      })
     };
 };
+  const modelArr = [{name: 'Export lasso data only'},{name: 'Export lasso data + run cellCluster analysis'},{name: 'Export all data only'},{name: 'Export all data + run cellCluster analysis'}]
+  let getMessageContent = ()=>{
+    const div = makeElement('div', ['el-message-box__container']);
+    const title = makeElement('div', ['div'], {}, 'Mean MID counts: 3601.32. Mean genes: 993.48');
+    const subDiv = makeElement('div', ['analysisConfig']);
+    const subTitle = makeElement('div', ['subTitle'],{},'You can do');
+    const Prefix = makeElement('h3', [], {}, 'Prefix of export file: ');
+    const perfixInput = makeElement('input', ['perfix-input']);
+    const preDiv = makeElement('div');
+    preDiv.appendChild(Prefix);
+    preDiv.appendChild(perfixInput);
+    const selectTitle = makeElement('h3', [], {}, 'Select export model:');
+    const selectOption = makeElement('div', ['selectOpt']);
+    for(let i = 0; i < modelArr.length; i++){
+      var radio = makeElement('input', [],{'type':'radio', 'name': 'exportModel', 'value': i}) as HTMLInputElement;
+      var label = makeElement('label', [], {}, modelArr[i].name);
+      var ele = makeElement('div',[],{})
+      if(i === 0){
+        radio.setAttribute('checked','checked')
+      }
+      ele.appendChild(radio);
+      ele.appendChild(label)
+      selectOption.appendChild(ele)
+    }
+    let binlist = viewer.dataSource.subsources[0].subsource.annotation?.metadata?.binlist;
+    const seleDiv = makeElement('div');
+    const seleTitle = makeElement('h3', [], {}, 'Select bin size: ');
+    const selectBin = document.createElement('select');
+    selectBin.classList.add('lassoBinSize');
+    let bin = viewer.state.toJSON().layers[0].source.split('/');
+    lastParamBin = bin.splice(bin.length - 1, 1)
+    for(let i = 0; i < binlist.length; i++){
+      selectBin.options.add(new Option(binlist[i], binlist[i],false, binlist[i] === lastParamBin[0]?true:false) );
+    }
+    seleDiv.appendChild(seleTitle);
+    seleDiv.appendChild(selectBin);
+    div.appendChild(title);
+    div.appendChild(subDiv);
+    div.appendChild(subTitle);
+    div.appendChild(preDiv);
+    div.appendChild(selectTitle);
+    div.appendChild(selectOption);
+    div.appendChild(seleDiv);
+    return div
+  }
+  // 确认套索
+  let submit = async ():Promise<void>=>{
+    let radio = null
+    var obj = document.getElementsByName("exportModel");
+    for (var i = 0; i < obj.length; i++) { //遍历Radio 
+      console.log(obj[i])
+      if (obj[i].checked) {
+        radio = obj[i].value;                   
+      }
+    };
+    let binsize = (document.getElementsByClassName("lassoBinSize")[0] as HTMLInputElement)?.value.substring(3);
+    let prefix = (document.getElementsByClassName("perfix-input")[0] as HTMLInputElement)?.value.substring(3);
+    let host = viewer.state.toJSON().layers[0].source.split('/');
+    let url = host[2] + '//' + host[4] + '/' + host[5] +'/task/lasso';
+    var data = new FormData();
+    data.append('curr_bin',lastParamBin);
+    data.append('export_bin',binsize);
+    data.append('points',result);
+    data.append('prefix',prefix);
+    let json = {
+      method: 'post',
+      body: data
+    }
+    let req = async (): Promise<any> =>{
+      return await cancellableFetchSpecialOk(undefined, `${url}`, json, responseJson);
+    };
+    let res = await req();
+    if( res?.code === 200 ){
+      console.log('cg')
+    }else{
+
+    }
+    console.log(radio, binsize, prefix)
+  }
   // 获取spot坐标
   let getPosition = (arr:any[])=>{
     let newarr = arr.flat();
@@ -275,16 +362,23 @@ function isLasso(value:boolean, layerSelectedValues: LayerSelectedValues, sliceV
     for(let i = xMin; i < xMax; i++){
       for(let j = yMin; j < yMax; j++){
         if(ctx!.isPointInPath(i, j, 'evenodd') && ctx!.getImageData(i, j, 1, 1).data[1] == 128){
-          // sliceView.handleMouseMove(i+xreduce, j+yreduce);
-          // sliceView.pickRequests[0].glWindowX = i+xreduce;
-          // sliceView.pickRequests[0].glWindowY = j+yreduce;
-          // sliceView.attemptToIssuePickRequest();
+          sliceView.handleMouseMove(i+xreduce, j+yreduce);
+          sliceView.pickRequests[0].glWindowX = i+xreduce;
+          sliceView.pickRequests[0].glWindowY = j+yreduce;
+          sliceView.issuePickRequest(i+xreduce, j+yreduce)
           result.push([layerSelectedValues.mouseState.position[0],layerSelectedValues.mouseState.position[1]]);
         }else{
         }
       }
     };
   }
+  console.log(result)
+}
+
+function showMessageBox(title: string, content:Node){
+  let message = new MessageBox(title, content);
+  message.element.style.display = 'block';
+  return message
 }
 
 function registerRelatedLayouts(
