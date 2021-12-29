@@ -247,7 +247,6 @@ function isLasso(value:boolean, layerSelectedValues: LayerSelectedValues, sliceV
     canvas.onmousemove = function (e) {
       if (drawNow) {
         sliceView.handleMouseMove(e.clientX, e.clientY);
-        // layerSelectedValues.mouseState.setActive(true);
         result.push([layerSelectedValues.mouseState.position[0],layerSelectedValues.mouseState.position[1]]);
         points[points.length - 1].push({ x: e.offsetX, y: e.offsetY , clientx: e.clientX, clienty: e.clientX});
         draw();
@@ -319,16 +318,16 @@ function isLasso(value:boolean, layerSelectedValues: LayerSelectedValues, sliceV
     var obj = document.getElementsByName("exportModel");
     for (var i = 0; i < obj.length; i++) { //遍历Radio 
       console.log(obj[i])
-      if (obj[i].checked) {
-        radio = obj[i].value;                   
+      if ( (obj[i] as HTMLInputElement).checked) {
+        radio = (obj[i] as HTMLInputElement).value;                   
       }
     };
     let binsize = (document.getElementsByClassName("lassoBinSize")[0] as HTMLInputElement)?.value.substring(3);
-    let prefix = (document.getElementsByClassName("perfix-input")[0] as HTMLInputElement)?.value.substring(3);
+    let prefix = (document.getElementsByClassName("perfix-input")[0] as HTMLInputElement)?.value;
     let host = viewer.state.toJSON().layers[0].source.split('/');
     let url = host[2] + '//' + host[4] + '/' + host[5] +'/task/lasso';
     var data = new FormData();
-    data.append('curr_bin',lastParamBin);
+    data.append('curr_bin',lastParamBin[0].substring(3));
     data.append('export_bin',binsize);
     data.append('points',result);
     data.append('prefix',prefix);
@@ -345,6 +344,8 @@ function isLasso(value:boolean, layerSelectedValues: LayerSelectedValues, sliceV
     }else{
 
     }
+    ctx!.clearRect(0, 0, w, h);
+    document.removeChild(canvas);
     console.log(radio, binsize, prefix)
   }
   // 获取spot坐标
