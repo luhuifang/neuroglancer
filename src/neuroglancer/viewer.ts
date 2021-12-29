@@ -21,6 +21,7 @@ import svg_controls_alt from 'ikonate/icons/controls-alt.svg';
 import svg_layers from 'ikonate/icons/layers.svg';
 import svg_list from 'ikonate/icons/list.svg';
 import svg_settings from 'ikonate/icons/settings.svg';
+import svg_gene from 'ikonate/icons/gene.svg';
 import debounce from 'lodash/debounce';
 import {CapacitySpecification, ChunkManager, ChunkQueueManager, FrameNumberCounter} from 'neuroglancer/chunk_manager/frontend';
 import {makeCoordinateSpace, TrackableCoordinateSpace} from 'neuroglancer/coordinate_transform';
@@ -67,6 +68,7 @@ import {makeIcon} from 'neuroglancer/widget/icon';
 import {MousePositionWidget, PositionWidget} from 'neuroglancer/widget/position_widget';
 import {TrackableScaleBarOptions} from 'neuroglancer/widget/scale_bar';
 import {RPC} from 'neuroglancer/worker_rpc';
+import { genePanelState, GeneTabView } from './ui/layer_gene_table_tab';
 
 declare var NEUROGLANCER_OVERRIDE_DEFAULT_VIEWER_OPTIONS: any
 
@@ -109,6 +111,7 @@ export class InputEventBindings extends DataPanelInputEventBindings {
 }
 
 export const VIEWER_TOP_ROW_CONFIG_OPTIONS = [
+  'showGeneButton',
   'showHelpButton',
   'showSettingsButton',
   'showEditStateButton',
@@ -296,6 +299,7 @@ export class Viewer extends RefCounted implements ViewerState {
   statisticsDisplayState = new StatisticsDisplayState();
   helpPanelState = new HelpPanelState();
   settingsPanelState = new ViewerSettingsPanelState();
+  genePanelState = new genePanelState();
   layerSelectedValues =
       this.registerDisposer(new LayerSelectedValues(this.layerManager, this.mouseState));
   selectionDetailsState = this.registerDisposer(
@@ -616,6 +620,20 @@ export class Viewer extends RefCounted implements ViewerState {
       topRow.appendChild(button.element);
     }
 
+    {
+      const {genePanelState} = this;
+      const button =
+          this.registerDisposer(new CheckboxIcon(genePanelState.location.watchableVisible, {
+            svg: svg_settings,
+            backgroundScheme: 'dark',
+            enableTitle: 'Show genetable panel',
+            disableTitle: 'Hide genetable panel'
+          }));
+      this.registerDisposer(new ElementVisibilityFromTrackableBoolean(
+          this.uiControlVisibility.showGeneButton, button.element));
+      topRow.appendChild(button.element);
+    }
+
     this.registerDisposer(new ElementVisibilityFromTrackableBoolean(
         makeDerivedWatchableValue(
             (...values: boolean[]) => values.reduce((a, b) => a || b, false),
@@ -670,6 +688,11 @@ export class Viewer extends RefCounted implements ViewerState {
       location: this.settingsPanelState.location,
       makePanel: () =>
           new ViewerSettingsPanel(this.sidePanelManager, this.settingsPanelState, this),
+    }));
+    this.registerDisposer(this.sidePanelManager.registerPanel({
+      location: this.genePanelState.location,
+      makePanel: () =>
+          new GeneTabView(this.sidePanelManager, this.genePanelState),
     }));
 
     const updateVisibility = () => {

@@ -33,7 +33,6 @@ import {EventActionMap} from 'neuroglancer/util/mouse_bindings';
 import {CheckboxIcon} from 'neuroglancer/widget/checkbox_icon';
 import {makeDeleteButton} from 'neuroglancer/widget/delete_button';
 import {TabView} from 'neuroglancer/widget/tab_view';
-import {GeneTabView} from 'neuroglancer/ui/layer_gene_table_tab'
 import { DataSourceView, SourceUrlAutocomplete } from './layer_data_sources_tab';
 import { viewer } from 'src/main';
 
@@ -115,7 +114,6 @@ export class LayerTypeWidget extends RefCounted {
 
 class LayerSidePanel extends SidePanel {
   tabView: TabView;
-  geneView: GeneTabView;
   layer: UserLayer;
   DataSourceView: DataSourceView;
   urlInput: SourceUrlAutocomplete;
@@ -235,61 +233,60 @@ class LayerSidePanel extends SidePanel {
           },
         },
         this.visibility);
-      this.geneView = new GeneTabView();
+      // this.geneView = new GeneTabView();
     // 拿到URLInput实例
-    if(this.tabView.stack.sourceTab !==undefined){
-      let sourceViews = this.tabView.stack.sourceTab.sourceViews;
-      sourceViews.forEach((v) => {
-        if(v instanceof DataSourceView){
-          this.urlInput = v.urlInput;
-          if((this.urlInput.inputElement as HTMLInputElement)?.innerText){
-            this.geneView.initGeneTable((this.urlInput.inputElement as HTMLInputElement)?.innerText)
-          }
-          registerActionListener(this.urlInput.inputElement, 'commit', (event: CustomEvent) => {
-            this.geneView.initGeneTable((event.target as HTMLElement).innerText)
-          });
-        }
-      })
-    }
+    // if(this.tabView.stack.sourceTab !==undefined){
+    //   let sourceViews = this.tabView.stack.sourceTab.sourceViews;
+    //   sourceViews.forEach((v) => {
+    //     if(v instanceof DataSourceView){
+    //       this.urlInput = v.urlInput;
+    //       if((this.urlInput.inputElement as HTMLInputElement)?.innerText){
+    //         this.geneView.initGeneTable((this.urlInput.inputElement as HTMLInputElement)?.innerText)
+    //       }
+    //       registerActionListener(this.urlInput.inputElement, 'commit', (event: CustomEvent) => {
+    //         this.geneView.initGeneTable((event.target as HTMLElement).innerText)
+    //       });
+    //     }
+    //   })
+    // }
     this.tabView.element.style.flex = '1';
     this.tabView.element.classList.add('neuroglancer-layer-side-panel-tab-view');
     this.tabView.element.style.position = 'relative';
     this.tabView.element.appendChild(this.makeTabDropZone());
     this.addBody(this.tabView.element);
-    this.geneView.tbody.addEventListener('click', (event:Event) =>{
-      geneIdClickCount++;
-      // 记录点选geneId前的url路径，为resetButton做准备
-      if(geneIdClickCount === 1){
-        resetUrl = viewer.state.toJSON().layers[0].source;
-      }
-      // 清空上一个点选内容
-      if(document.getElementsByClassName('success-row')[0]){
-        document.getElementsByClassName('success-row')[0].className = '';
-      }
-      // 判断是否选中td，是则该行的tr添加success-row类名
-      if((event.target as Element).parentElement?.parentElement?.localName === 'tr'){
-        (event.target as Element).parentElement?.parentElement?.classList.add('success-row');
-        this.changeGeneId( this.urlInput, (event.target as Element).attributes[1].value, false);
-      }
-    });
-    // geneTable 重置按钮
-    this.geneView.button.addEventListener('click',()=>{
-      geneIdClickCount = 0;
-      if(document.getElementsByClassName('success-row')[0]){
-        document.getElementsByClassName('success-row')[0].className = ''
-      }
-      resetUrl = viewer.state.toJSON().layers[0].source.split('/');
-      var len = resetUrl.indexOf('gene');
-      resetUrl.splice(len, 2, 'dnb');
-      var newUrl = resetUrl.join('/')
-      this.changeGeneId( this.urlInput, newUrl, true);
-    });
-    this.geneView.element.style.flex = '1';
-    this.geneView.element.classList.add('neuroglancer-layer-side-panel-tab-view');
-    this.geneView.element.style.position = 'relative';
-    this.geneView.element.appendChild(this.makeTabDropZone());
-    // const closeGeneView = new geneCloseBtn()
-    this.addBody(this.geneView.element);
+    // this.geneView.tbody.addEventListener('click', (event:Event) =>{
+    //   geneIdClickCount++;
+    //   // 记录点选geneId前的url路径，为resetButton做准备
+    //   if(geneIdClickCount === 1){
+    //     resetUrl = viewer.state.toJSON().layers[0].source;
+    //   }
+    //   // 清空上一个点选内容
+    //   if(document.getElementsByClassName('success-row')[0]){
+    //     document.getElementsByClassName('success-row')[0].className = '';
+    //   }
+    //   // 判断是否选中td，是则该行的tr添加success-row类名
+    //   if((event.target as Element).parentElement?.parentElement?.localName === 'tr'){
+    //     (event.target as Element).parentElement?.parentElement?.classList.add('success-row');
+    //     this.changeGeneId( this.urlInput, (event.target as Element).attributes[1].value, false);
+    //   }
+    // });
+    // // geneTable 重置按钮
+    // this.geneView.button.addEventListener('click',()=>{
+    //   geneIdClickCount = 0;
+    //   if(document.getElementsByClassName('success-row')[0]){
+    //     document.getElementsByClassName('success-row')[0].className = ''
+    //   }
+    //   resetUrl = viewer.state.toJSON().layers[0].source.split('/');
+    //   var len = resetUrl.indexOf('gene');
+    //   resetUrl.splice(len, 2, 'dnb');
+    //   var newUrl = resetUrl.join('/')
+    //   this.changeGeneId( this.urlInput, newUrl, true);
+    // });
+    // this.geneView.element.style.flex = '1';
+    // this.geneView.element.classList.add('neuroglancer-layer-side-panel-tab-view');
+    // this.geneView.element.style.position = 'relative';
+    // this.geneView.element.appendChild(this.makeTabDropZone());
+    // this.addBody(this.geneView.element);
     // this.addBody(closeGeneView.closeIcon)
     // Hide panel automatically if there are no tabs to display (because they have all been moved to
     // another panel).

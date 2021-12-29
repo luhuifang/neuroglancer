@@ -129,11 +129,8 @@ export class LayoutComponentContainer extends RefCounted {
   constructor(public viewer: Viewer, spec: any, public parent: StackLayoutComponent|undefined) {
     super();
     const {element} = this;
-    element.classList.add('stereomapContaioner');
     element.style.display = 'flex';
     element.style.flex = '1';
-    element.style.marginLeft = '18%';
-    element.style.position = 'relative';
     element.style.alignItems = 'stretch';
     (<any>element)[layoutComponentContainerSymbol] = this;
 

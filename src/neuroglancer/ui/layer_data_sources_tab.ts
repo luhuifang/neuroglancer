@@ -282,20 +282,16 @@ function getNearCale(value: number){
 
 export class SelectBinView extends RefCounted{
   selectElement = document.createElement('select');
-  // urlJson = JSON.parse( window.decodeURIComponent(window.location.href.split('!')[1]) );
-  url = viewer.state.toJSON().layers[0].source;
-  inputValue = this.url.split('/');
+  url = viewer.state;
+  inputValue = this.url.toJSON().layers[0].source.split('/');
   lastParam:any = this.inputValue.splice(this.inputValue.length - 1, 1)
   constructor(public source: Borrowed<LoadedLayerDataSource>){
     super();
-    // console.log(this.url, this.urlJson)
     this.selectElement.classList.add('neuroglancer-layer-side-panel-type-hq');
     this.selectElement.id = 'hqDefineSelect';
     this.selectElement.style.width = '100%';
     let binList = source.dataSource.subsources[0].subsource.annotation?.metadata?.binlist;
-    viewer.dataSource = source.dataSource
-    console.log(viewer.state.toJSON(), viewer)
-    this.selectElement.style.display = binList?'block':'none';
+    viewer.dataSource = source.dataSource;
     this.registerDisposer(() => removeFromParent(this.selectElement));
     if(binList?.length>0 && binList.includes(this.lastParam[0])){
       for(let i = 0; i < binList.length; i++){
@@ -306,15 +302,15 @@ export class SelectBinView extends RefCounted{
     (document.getElementsByClassName('colorBarScale')[0] as HTMLElement).style.display = 'block';
   }
 
-  onchange = (urlInput: SourceUrlAutocomplete, flag: Boolean = true) => {
+  onchange = (flag: Boolean = true) => {
     let objS = (document.getElementsByClassName("neuroglancer-layer-side-panel-type-hq")[0] as HTMLInputElement).value;
     this.lastParam = this.inputValue.join('/')+'/'+objS;
     if(flag){
-      urlInput.setValueAndSelection(this.lastParam);
-      let explicit = true;
-      urlInput.disableCompletion();
-      urlInput.hideCompletions();
-      urlInput.onCommit.dispatch(this.lastParam, explicit);
+      let json = this.url.toJSON();
+      json.layers[0].source = this.lastParam;
+      this.url.toJSON().layers[0].source = this.lastParam;
+      this.url.reset();
+      this.url.restoreState(json);
     }
   }
   
@@ -395,7 +391,7 @@ export class DataSourceView extends RefCounted {
       this.element.appendChild(selectBinView.selectElement)
       this.element.appendChild(loadedView.element);
       selectBinView.selectElement.onchange =() =>{
-        selectBinView?.onchange(this.urlInput);
+        selectBinView?.onchange();
       }
     }
   }

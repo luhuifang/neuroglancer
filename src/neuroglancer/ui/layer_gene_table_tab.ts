@@ -4,10 +4,15 @@ import { removeChildren } from '../util/dom';
 import { TabView } from '../widget/tab_view';
 import { cancellableFetchSpecialOk } from '../util/special_protocol_request';
 import { responseJson } from '../util/http_request';
-import 'neuroglancer/ui/layer_gene_table_tab.css'
-import { viewer } from 'src/main';
+import {viewer} from 'src/main'
+import { DEFAULT_SIDE_PANEL_LOCATION, SidePanelLocation, TrackableSidePanelLocation } from './side_panel_location';
+import { emptyToUndefined } from '../util/json';
+import { SidePanel, SidePanelManager } from './side_panel';
+import 'neuroglancer/ui/layer_gene_table_tab.css';
+import './viewer_settings.css';
 
 let reqUrl: any;
+let geneIdClickCount:number = 0;
 // 创建一个element
 export const makeElement = (
     tag: string,
@@ -54,7 +59,27 @@ const makeSort = (
     div.appendChild(span);
     return div;
 };
-export class GeneTabView extends RefCounted {
+const DEFAULT_GENE_PANEL_LOCATION: SidePanelLocation = {
+    ...DEFAULT_SIDE_PANEL_LOCATION,
+    side: 'left',
+    row: 3,
+  };
+export class genePanelState {
+    location = new TrackableSidePanelLocation(DEFAULT_GENE_PANEL_LOCATION);
+    get changed() {
+      return this.location.changed;
+    }
+    toJSON() {
+      return emptyToUndefined(this.location.toJSON());
+    }
+    reset() {
+      this.location.reset();
+    }
+    restoreState(obj: unknown) {
+      this.location.restoreState(obj);
+    }
+  }
+export class GeneTabView extends SidePanel {
     [x: string]: any;
     element = document.createElement('div');
     tabBar = document.createElement('div');
@@ -71,9 +96,9 @@ export class GeneTabView extends RefCounted {
     pagenation = document.createElement('div');
     totalPage:any;
     tabView: TabView;
-    closeBtn = new geneCloseBtn();
-    constructor() {
-        super();
+    json = viewer.state.toJSON();
+    constructor(sidePanelManager: SidePanelManager, state: genePanelState) {
+        super(sidePanelManager, state.location);
         const {element, tabBar} = this;
         element.className = 'neuroglancer-annotation-geneTable-tab';
         tabBar.className = 'neuroglancer-tab-gene-view-bar';
@@ -81,7 +106,7 @@ export class GeneTabView extends RefCounted {
         element.appendChild(tabBar);
         this.element.appendChild(this.geneTableHead());
         this.element.appendChild(this.geneFiiter());
-        this.element.appendChild(this.closeBtn.closeIcon);
+        this.initGeneTable(this.json.layers[0].source);
     }
     async initGeneTable(value: string){
         reqUrl = value
@@ -169,7 +194,17 @@ export class GeneTabView extends RefCounted {
                 tr.appendChild(tdMIDCount)
                 tr.appendChild(tdE10)
                 this.tbody.appendChild(tr)
-                this.listEle.appendChild(this.tbody)
+                this.listEle.appendChild(this.tbody);
+                tr.addEventListener('click', (event:Event) =>{
+                    geneIdClickCount++;
+                    // 清空上一个点选内容
+                    if(document.getElementsByClassName('success-row')[0]){
+                        document.getElementsByClassName('success-row')[0].className = '';
+                    }
+                    // 判断是否选中td，是则该行的tr添加success-row类名
+                    tr.classList.add('success-row');
+                    this.changeGeneId( (event.target as Element).attributes[1].value, false);
+                });
             })
         }else{
             this.listEle.innerHTML = `<div class="nodata">暂无数据</div>`
@@ -227,6 +262,19 @@ export class GeneTabView extends RefCounted {
     geneTableReset(){
         this.button.classList.add('el-button','el-button--default','is-plain');
         this.button.innerHTML = `<span>RESET</span>`;
+        this.button.addEventListener('click',()=>{
+            if(document.getElementsByClassName('success-row')[0]){
+                document.getElementsByClassName('success-row')[0].className = ''
+            }
+            if(geneIdClickCount > 0){
+                let resetUrl = viewer.state.toJSON().layers[0].source.split('/');
+                var len = resetUrl.indexOf('gene');
+                resetUrl.splice(len, 2, 'dnb');
+                var newUrl = resetUrl.join('/')
+                this.changeGeneId( newUrl, true);
+            }
+            geneIdClickCount = 0;
+        });
         return this.button;
     }
     formatter(num:any){
@@ -249,8 +297,22 @@ export class GeneTabView extends RefCounted {
             return reqUrl
         }
     }
-    getData(){
-
+    changeGeneId(value:any, flag:boolean = false){
+        let lastParam:any = '';
+        let newJson = viewer.state.toJSON();
+        if(!flag){
+            let inputValue = newJson.layers[0].source.split('/');
+            // 判断是否包含bin
+            let num = inputValue.includes('bin')?1:2;
+            inputValue.splice(inputValue.indexOf('annotation') + 1, inputValue.length - num - inputValue.indexOf('annotation'), 'gene/'+value);
+            lastParam = inputValue.join('/');
+        }else{
+            lastParam = value;
+        }
+        newJson.layers[0].source = lastParam;
+        viewer.state.reset();
+        viewer.state.restoreState(newJson);
+        console.log(newJson)
     }
 }
 let isCloseFlag = false
