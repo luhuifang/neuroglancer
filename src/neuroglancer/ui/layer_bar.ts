@@ -33,6 +33,7 @@ import {makeDeleteButton} from 'neuroglancer/widget/delete_button';
 import {makeIcon} from 'neuroglancer/widget/icon';
 import {PositionWidget} from 'neuroglancer/widget/position_widget';
 import { Tooltip } from '../widget/tooltip';
+import { viewer } from 'src/main';
 
 class LayerWidget extends RefCounted {
   element = document.createElement('div');
@@ -275,7 +276,18 @@ export class LayerBar extends RefCounted {
   handleLayerItemValueChanged() {
     this.element.dataset.showHoverValues = this.showLayerHoverValues.value.toString()
   }
-  private scheduleUpdate = this.registerCancellable(animationFrameDebounce(() => this.update()))
+  private scheduleUpdate = this.registerCancellable(animationFrameDebounce(() => this.update()));
+  sortFieldMatch (field:string) {
+    const stringArray = field.split('') // 将字符串分割成相应的字符串数组
+    let newField = field
+    stringArray.forEach(t => {
+      if (/[A-Z]/.test(t)) { 
+        // 遍历分割之后的字符串组，将找到的大写字母替换成其他字符串，将替换后的字符串赋值给另外一个新的string 变量
+        newField = newField.replace(t, ` ${t.toLowerCase()}`)
+      }
+    })
+    return newField
+  }
   update() {
     this.valueUpdateNeeded = false;
     this.updateLayers();
@@ -287,13 +299,20 @@ export class LayerBar extends RefCounted {
       let userLayer = layer.layer;
       let text = '';
       let MIDcount = '';
+      let propertyStr = '';
       if (userLayer !== null) {
         let state = values.get(userLayer);
         if (state !== undefined) {
           const {value, geneId} = state;
+          const {property} = state;
           if (value !== undefined) {
             text = '' + value;
             MIDcount = '' + geneId
+          }
+          if(property !== undefined){
+            property.forEach((item)=>{
+              propertyStr += `<br>${ this.sortFieldMatch(item.name) }s：${ item.counts }`
+            })
           }
         }
       }
@@ -306,7 +325,7 @@ export class LayerBar extends RefCounted {
       this.positionx = values.mouseState.position[0];
       this.positiony = values.mouseState.position[1];
       widget.valueElement.textContent = text;
-      this.tootips.element.innerHTML = `(${this.positionx}, ${this.positiony})<br>gene counts： ${MIDcount} <br> MID counts： ${text}`;
+      this.tootips.element.innerHTML = `(${this.positionx}, ${this.positiony})${propertyStr}`;
       if(text){
         this.tootips.element.style.display = 'block'
         this.tootips.updatePosition(values.mouseState.pageX, values.mouseState.pageY)

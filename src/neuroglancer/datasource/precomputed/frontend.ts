@@ -42,6 +42,7 @@ import * as matrix from 'neuroglancer/util/matrix';
 import {getObjectId} from 'neuroglancer/util/object_id';
 import {cancellableFetchSpecialOk, parseSpecialUrl, SpecialProtocolCredentials, SpecialProtocolCredentialsProvider} from 'neuroglancer/util/special_protocol_request';
 import {Uint64} from 'neuroglancer/util/uint64';
+import {viewer} from 'src/main';
 class PrecomputedVolumeChunkSource extends
 (WithParameters(WithCredentialsProvider<SpecialProtocolCredentials>()(VolumeChunkSource), VolumeChunkSourceParameters)) {}
 
@@ -621,6 +622,7 @@ class AnnotationMetadata {
   spatialIndices: AnnotationSpatialIndexLevelMetadata[];
   binlist : string[];
   maxValue: string|number;
+  properties: any[];
   constructor(public url: string, metadata: any) {
     verifyObject(metadata);
     const baseCoordinateSpace =
@@ -694,6 +696,7 @@ class AnnotationMetadata {
     this.spatialIndices.reverse();
     this.binlist = metadata.binlist;
     this.maxValue = metadata.maxValue;
+    this.properties = metadata.properties;
   }
 }
 

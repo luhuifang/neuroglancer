@@ -699,7 +699,6 @@ class RenderingOptionsTab extends Tab {
             .registerDisposer(new DependentViewWidget(
                 layer.annotationProperties,
                 (properties, parent) => {
-                  console.log(layer.annotationProperties)
                   if (properties === undefined || properties.length === 0) return;
                   const propertyList = document.createElement('div');
                   parent.appendChild(propertyList);

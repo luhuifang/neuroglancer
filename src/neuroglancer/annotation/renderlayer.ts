@@ -480,7 +480,6 @@ function AnnotationRenderLayer<TBase extends AnyConstructor<VisibilityTrackedRen
     updateMouseState(
         mouseState: MouseSelectionState, _pickedValue: Uint64, pickedOffset: number, data: any) {
           const chunk = data as AnnotationGeometryDataInterface;
-      console.log(_pickedValue, pickedOffset, data)
       const {serializedAnnotations} = chunk;
       const {typeToIds, typeToOffset} = serializedAnnotations;
       const rank = this.curRank;
@@ -558,8 +557,8 @@ function AnnotationRenderLayer<TBase extends AnyConstructor<VisibilityTrackedRen
     transformPickedValue(pickState: PickState) {
       return this.transformPickedBaseValue(pickState, 0);
     }
-    transformPickedValueGeneCount(pickState: PickState) {
-      return this.transformPickedBaseValue(pickState, 1);
+    transformPickedValueGeneCount(pickState: PickState, index:number) {
+      return this.transformPickedBaseValue(pickState, index);
     }
 
     isReady() {

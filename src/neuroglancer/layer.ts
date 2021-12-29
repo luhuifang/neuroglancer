@@ -49,6 +49,7 @@ import {WatchableVisibilityPriority} from 'neuroglancer/visibility_priority/fron
 import {DependentViewContext} from 'neuroglancer/widget/dependent_view_widget';
 import {TabSpecification} from 'neuroglancer/widget/tab_view';
 import {RPC} from 'neuroglancer/worker_rpc';
+import { viewer } from 'src/main';
 
 const TOOL_JSON_KEY = 'tool';
 const TOOL_BINDINGS_JSON_KEY = 'toolBindings';
@@ -57,7 +58,6 @@ const LOCAL_COORDINATE_SPACE_JSON_KEY = 'localDimensions';
 const SOURCE_JSON_KEY = 'source';
 const TRANSFORM_JSON_KEY = 'transform';
 const PICK_JSON_KEY = 'pick';
-
 export interface UserLayerSelectionState {
   generation: number;
 
@@ -75,6 +75,8 @@ export interface UserLayerSelectionState {
   geneId: number | string | undefined;
   MIDcount: number | string | undefined;
   value: any;
+  property: any[];
+  color: any
 }
 
 export class LayerActionContext {
@@ -124,6 +126,8 @@ export class UserLayer extends RefCounted {
     state.value = undefined;
     state.geneId = undefined;
     state.MIDcount = undefined;
+    state.color = undefined;
+    state.property = [];
   }
 
   resetSelectionState(state: this['selectionState']) {
@@ -158,9 +162,9 @@ export class UserLayer extends RefCounted {
       state.annotationSubsource =
           verifyOptionalObjectProperty(json, 'annotationSubsource', verifyString);
       state.geneId =
-      verifyOptionalObjectProperty(json, 'prop_mid', verifyString);
-      state.MIDcount =
       verifyOptionalObjectProperty(json, 'prop_genecount', verifyString);
+      state.MIDcount =
+      verifyOptionalObjectProperty(json, 'prop_mid', verifyString);
     }
     state.value = json.value;
   }
@@ -208,7 +212,28 @@ export class UserLayer extends RefCounted {
     }
     state.localPositionValid = true;
     state.value = this.getValueAt(mouseState.position, mouseState);
-    state.geneId = this.getValueAtGeneCount(mouseState.position, mouseState);
+    state.geneId = this.getValueAtGeneCount(mouseState.position, mouseState, 1);
+    state.MIDcount = this.getValueAtGeneCount(mouseState.position, mouseState, 0);
+    state.color = this.getValueAtGeneCount(mouseState.position, mouseState, 2);
+    let properties = viewer.dataSource.subsources[0].subsource.annotation?.metadata.properties;
+    let newProp:any = [];
+    for(let i = 0; i < properties.length; i++){
+      if(properties[i].id === 'color'){
+        break;
+      }else{
+        newProp.push(properties[i]);
+      }
+    };
+    state.property = newProp;
+    let resultProp:any = [];
+    for(var i = 0; i < newProp.length; i++){
+      resultProp.push({
+        name: newProp[i].id,
+        counts: this.getValueAtGeneCount(mouseState.position, mouseState, i),
+        type: newProp[i].type
+      })
+    };
+    state.property = resultProp;
   }
 
   copySelectionState(dest: this['selectionState'], source: this['selectionState']) {
@@ -444,13 +469,13 @@ export class UserLayer extends RefCounted {
     return this.transformPickedValue(result);
   }
 
-  getValueAtGeneCount(position: Float32Array, pickState: PickState) {
+  getValueAtGeneCount(position: Float32Array, pickState: PickState, index:number) {
     let result: any;
     let {renderLayers} = this;
     let {pickedRenderLayer} = pickState;
     if (pickedRenderLayer !== null && renderLayers.indexOf(pickedRenderLayer) !== -1) {
       // result  =>  string : '44'
-      result = pickedRenderLayer.transformPickedValueGeneCount(pickState);
+      result = pickedRenderLayer.transformPickedValueGeneCount(pickState, index);
       result = this.transformPickedValue(result);
       if (result != null) return result;
     }
