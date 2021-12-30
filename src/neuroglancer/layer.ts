@@ -212,9 +212,6 @@ export class UserLayer extends RefCounted {
     }
     state.localPositionValid = true;
     state.value = this.getValueAt(mouseState.position, mouseState);
-    state.geneId = this.getValueAtGeneCount(mouseState.position, mouseState, 1);
-    state.MIDcount = this.getValueAtGeneCount(mouseState.position, mouseState, 0);
-    state.color = this.getValueAtGeneCount(mouseState.position, mouseState, 2);
     let properties = viewer.dataSource.subsources[0].subsource.annotation?.metadata.properties;
     let newProp:any = [];
     for(let i = 0; i < properties.length; i++){

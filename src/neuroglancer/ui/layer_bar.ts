@@ -298,16 +298,14 @@ export class LayerBar extends RefCounted {
     for (let [layer, widget] of this.layerWidgets) {
       let userLayer = layer.layer;
       let text = '';
-      let MIDcount = '';
       let propertyStr = '';
       if (userLayer !== null) {
         let state = values.get(userLayer);
         if (state !== undefined) {
-          const {value, geneId} = state;
+          const {value} = state;
           const {property} = state;
           if (value !== undefined) {
             text = '' + value;
-            MIDcount = '' + geneId
           }
           if(property !== undefined){
             property.forEach((item)=>{
